@@ -37,15 +37,15 @@ public:
     /// <summary>
     /// Initialises a new instance.
     /// </summary>
-    /// <param name="rows"></param>
-    /// <param name="columns"></param>
-    /// <param name="value"></param>
+    /// <param name="rows">The number of rows in the matrix.</param>
+    /// <param name="columns">The number of columns in the matrix.</param>
+    /// <param name="value">The initial value of all matrix elements. This
+    /// parameter defaults to zero.</param>
     inline matrix(_In_ const std::size_t rows = 0,
             _In_ const std::size_t columns = 0,
             _In_ value_type value = static_cast<value_type>(0))
         : _consecutive((Layout == matrix_layout::row_major) ? columns : rows),
-            _elements(rows * columns, value) {
-    }
+            _elements(rows * columns, value) { }
 
     /// <summary>
     /// Extracts a column from the matrix.
