@@ -183,6 +183,15 @@ public:
         return this->_elements[this->index(row, column)];
     }
 
+    /// <summary>
+    /// Answer the flat in-memory representation of the matrix.
+    /// </summary>
+    /// <returns>The elements in the matrix. The order of the return value
+    /// depends on the layout of the matrix.</returns>
+    inline operator const std::vector<value_type>&(void) const noexcept {
+        return this->_elements;
+    }
+
 private:
 
     inline std::size_t index(_In_ const std::size_t row,
