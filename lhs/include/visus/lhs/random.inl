@@ -14,20 +14,92 @@ LHS_NAMESPACE::matrix<std::size_t, Layout>& LHS_NAMESPACE::random(
         _In_ TRng& rng,
         _In_ TDist& distribution) {
     // Derived from https://github.com/bertcarnell/lhs/blob/4be72495c0eba3ce0b1ae602122871ec83421db6/src/randomLHS.cpp#L26C1-L43C5
-    std::vector<std::size_t> indices(result.rows());
-    std::vector<typename TDist::result_type> values(indices.size());
+    const auto n = result.rows();
+    std::vector<std::size_t> indices(n);
+    std::vector<typename TDist::result_type> values(n);
 
-    for (std::size_t c = 0, ce = result.columns(); c < ce; ++c) {
-        for (std::size_t r = 0, re = result.rows(); r < re; ++r) {
+    for (std::size_t c = 0, k = result.columns(); c < k; ++c) {
+        for (std::size_t r = 0; r < n; ++r) {
             values[r] = distribution(rng);
         }
 
         detail::order(indices, values.begin(), values.end());
 
-        for (std::size_t r = 0, re = result.rows(); r < re; ++r) {
+        for (std::size_t r = 0; r < n; ++r) {
             result(r, c) = indices[r];
         }
     }
+
+    return result;
+}
+
+
+/*
+ * LHS_NAMESPACE::random
+ */
+template<class TValue,
+    LHS_NAMESPACE::matrix_layout Layout,
+    class TRng,
+    class TDist>
+std::enable_if_t<std::is_floating_point_v<TValue>,
+    LHS_NAMESPACE::matrix<TValue, Layout>&>
+LHS_NAMESPACE::random(_Inout_ matrix<TValue, Layout>& result,
+        _In_ const bool preserve_draw,
+        _In_ TRng& rng,
+        _In_ TDist& distribution) {
+    // Derived from https://github.com/bertcarnell/lhs/blob/4be72495c0eba3ce0b1ae602122871ec83421db6/src/randomLHS.cpp#L46C2-L113C10
+    const auto n = result.rows();
+    std::vector<std::size_t> indices(n);
+    std::vector<TValue> values(n);
+
+    if (preserve_draw) {
+        std::vector<TValue> values2(values.size());
+
+        for (std::size_t c = 0, k = result.columns(); c < k; ++c) {
+            for (std::size_t r = 0; r < n; ++r) {
+                values[r] = static_cast<TValue>(distribution(rng));
+            }
+            // Note: do not merge into one loop as this would change how
+            // the 'distribution' is sampled.
+            for (std::size_t r = 0; r < n; ++r) {
+                values2[r] = static_cast<TValue>(distribution(rng));
+            }
+
+            detail::order(indices, values.begin(), values.end());
+
+            for (std::size_t r = 0; r < n; ++r) {
+                result(r, c) = static_cast<TValue>(indices[r]) + values2[r];
+                result(r, c) /= static_cast<TValue>(n);
+            }
+        } /* for (std::size_t c = 0, k = result.columns(); c < k; ++c) */
+
+    } else {
+        const auto k = result.columns();
+
+        for (std::size_t c = 0; c < k; ++c) {
+            for (std::size_t r = 0; r < n; ++r) {
+                values[r] = static_cast<TValue>(distribution(rng));
+            }
+
+            auto indices = detail::order(values.begin(), values.end());
+
+            for (std::size_t r = 0; r < n; ++r) {
+                result(r, c) = static_cast<TValue>(indices[r]);
+            }
+        }
+
+        std::decay_t<decltype(result)> values2(result.rows(), result.columns());
+        for (std::size_t i = 0; i < values2.size(); ++i) {
+            values2[i] = static_cast<TValue>(distribution(rng));
+        }
+
+        for (std::size_t c = 0; c < k; ++c) {
+            for (std::size_t r = 0; r < n; ++r) {
+                result(r, c) += values2(r, c);
+                result(r, c) /= static_cast<TValue>(n);
+            }
+        }
+    } /* if (preserve_draw) */
 
     return result;
 }
