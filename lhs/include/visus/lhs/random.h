@@ -134,7 +134,6 @@ random(_Inout_ matrix<TValue, Layout>& result,
     _In_ TRng& rng,
     _In_ TDist& distribution);
 
-
 /// <summary>
 /// Create a stratified sample of a Latin unit hypercube.
 /// </summary>
