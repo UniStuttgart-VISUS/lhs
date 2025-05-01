@@ -11,7 +11,7 @@
 #include "visus/lhs/api.h"
 
 
-LHS_DETAIL_NAMESPACE_BEGIN
+LHS_NAMESPACE_BEGIN
 
 /// <summary>
 /// Specifies possible ways to store a matrix in memory.
@@ -37,6 +37,6 @@ enum class matrix_layout {
     row_major
 };
 
-LHS_DETAIL_NAMESPACE_END
+LHS_NAMESPACE_END
 
 #endif /* !defined(_LHS_MATRIX_LAYOUT_H) */

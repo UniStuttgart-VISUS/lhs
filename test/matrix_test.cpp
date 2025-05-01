@@ -10,7 +10,6 @@
 
 using namespace Microsoft::VisualStudio::CppUnitTestFramework;
 using namespace visus::lhs;
-using namespace visus::lhs::detail;
 
 
 namespace test {

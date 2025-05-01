@@ -6,12 +6,12 @@
 
 
 /*
- * LHS_DETAIL_NAMESPACE::matrix<TValue, Layout>::column
+ * LHS_NAMESPACE::matrix<TValue, Layout>::column
  */
-template<class TValue, LHS_DETAIL_NAMESPACE::matrix_layout Layout>
-template<LHS_DETAIL_NAMESPACE::matrix_layout L>
-LHS_DETAIL_NAMESPACE::matrix<TValue, L>&
-LHS_DETAIL_NAMESPACE::matrix<TValue, Layout>::column(
+template<class TValue, LHS_NAMESPACE::matrix_layout Layout>
+template<LHS_NAMESPACE::matrix_layout L>
+LHS_NAMESPACE::matrix<TValue, L>&
+LHS_NAMESPACE::matrix<TValue, Layout>::column(
         _Inout_ matrix<TValue, L>& dst,
         _In_ const std::size_t column) const {
     assert(dst.columns() == 1);
@@ -34,12 +34,12 @@ LHS_DETAIL_NAMESPACE::matrix<TValue, Layout>::column(
 }
 
 /*
- * LHS_DETAIL_NAMESPACE::matrix<TValue, Layout>::row
+ * LHS_NAMESPACE::matrix<TValue, Layout>::row
  */
-template<class TValue, LHS_DETAIL_NAMESPACE::matrix_layout Layout>
-template<LHS_DETAIL_NAMESPACE::matrix_layout L>
-LHS_DETAIL_NAMESPACE::matrix<TValue, L>&
-LHS_DETAIL_NAMESPACE::matrix<TValue, Layout>::row(
+template<class TValue, LHS_NAMESPACE::matrix_layout Layout>
+template<LHS_NAMESPACE::matrix_layout L>
+LHS_NAMESPACE::matrix<TValue, L>&
+LHS_NAMESPACE::matrix<TValue, Layout>::row(
         _Inout_ matrix<TValue, L>& dst,
         _In_ const std::size_t row) const {
     assert(dst.rows() == 1);
@@ -63,10 +63,10 @@ LHS_DETAIL_NAMESPACE::matrix<TValue, Layout>::row(
 
 
 /*
- * LHS_DETAIL_NAMESPACE::matrix<TValue, Layout>::operator ==
+ * LHS_NAMESPACE::matrix<TValue, Layout>::operator ==
  */
-template<class TValue, LHS_DETAIL_NAMESPACE::matrix_layout Layout>
-bool LHS_DETAIL_NAMESPACE::matrix<TValue, Layout>::operator ==(
+template<class TValue, LHS_NAMESPACE::matrix_layout Layout>
+bool LHS_NAMESPACE::matrix<TValue, Layout>::operator ==(
         _In_ const matrix& rhs) const noexcept {
     if (this->size() != rhs.size()) {
         return false;

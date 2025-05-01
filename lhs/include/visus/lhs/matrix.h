@@ -17,7 +17,7 @@
 #include "visus/lhs/matrix_layout.h"
 
 
-LHS_DETAIL_NAMESPACE_BEGIN
+LHS_NAMESPACE_BEGIN
 
 /// <summary>
 /// A minimal representation of a 2D matrix.
@@ -210,7 +210,7 @@ private:
     template<class, matrix_layout> friend class matrix;
 };
 
-LHS_DETAIL_NAMESPACE_END
+LHS_NAMESPACE_END
 
 #include "visus/lhs/matrix.inl"
 

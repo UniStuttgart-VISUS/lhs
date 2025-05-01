@@ -13,14 +13,13 @@ void LHS_DETAIL_NAMESPACE::order_by(
         _Inout_ std::vector<std::size_t>& indices,
         _In_ const TIterator begin,
         _In_ const TIterator end,
-        _In_ const TLess& less,
-        _In_ const std::size_t offset) {
+        _In_ const TLess& less) {
     indices.resize(std::distance(begin, end));
-    std::iota(indices.begin(), indices.end(), offset);
+    std::iota(indices.begin(), indices.end(), static_cast<std::size_t>(0));
 
     std::sort(indices.begin(),
         indices.end(),
-        [&less, &begin](const std::size_t lhs, const std::size_t rhs) {
+        [less, begin](const std::size_t lhs, const std::size_t rhs) {
             return less(*(begin + lhs), *(begin + rhs));
         });
 }
