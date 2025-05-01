@@ -81,7 +81,7 @@ LHS_NAMESPACE::random(_Inout_ matrix<TValue, Layout>& result,
                 values[r] = static_cast<TValue>(distribution(rng));
             }
 
-            auto indices = detail::order(values.begin(), values.end());
+            detail::order(indices, values.begin(), values.end());
 
             for (std::size_t r = 0; r < n; ++r) {
                 result(r, c) = static_cast<TValue>(indices[r]);
