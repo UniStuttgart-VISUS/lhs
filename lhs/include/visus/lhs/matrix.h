@@ -12,6 +12,7 @@
 #include <cstdlib>
 #include <cstring>
 #include <stdexcept>
+#include <type_traits>
 #include <vector>
 
 #include "visus/lhs/matrix_layout.h"
@@ -28,6 +29,14 @@ template<class TValue, matrix_layout Layout = matrix_layout::row_major>
 class matrix final {
 
 public:
+
+    /// <summary>
+    /// The return type of an accessor to a matrix element.
+    /// </summary>
+    typedef typename std::conditional<
+        (sizeof(TValue) > sizeof(std::intptr_t)),
+        TValue&,
+        TValue>::type return_value_type;
 
     /// <summary>
     /// The type used to store a scalar.
@@ -165,7 +174,7 @@ public:
     /// <param name="row">The zero-based row index.</param>
     /// <param name="column">The zero-based column index.</param>
     /// <returns>The element at the specified position.</returns>
-    inline value_type operator()(
+    inline const return_value_type operator()(
             _In_ const std::size_t row,
             _In_ const std::size_t column) const noexcept {
         return this->_elements[this->index(row, column)];
@@ -181,6 +190,27 @@ public:
             _In_ const std::size_t row,
             _In_ const std::size_t column) noexcept {
         return this->_elements[this->index(row, column)];
+    }
+
+    /// <summary>
+    /// Answer the element at the specified position.
+    /// </summary>
+    /// <param name="index">The flattened index of the matrix element.</param>
+    /// <returns>The element at the specified position.</returns>
+    inline const return_value_type operator[](
+            _In_ const std::size_t index) const noexcept {
+        assert(index < this->size());
+        return this->_elements[index];
+    }
+
+    /// <summary>
+    /// Answer the element at the specified position.
+    /// </summary>
+    /// <param name="index">The flattened index of the matrix element.</param>
+    /// <returns>The element at the specified position.</returns>
+    inline value_type& operator[](_In_ const std::size_t index) noexcept {
+        assert(index < this->size());
+        return this->_elements[index];
     }
 
     /// <summary>

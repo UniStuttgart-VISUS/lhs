@@ -115,6 +115,72 @@ inline matrix<std::size_t> random(
         std::uniform_real_distribution<float>(0.0f, 1.0f));
 }
 
+/// <summary>
+/// Create a stratified sample of a Latin unit hypercube.
+/// </summary>
+/// <typeparam name="TValue"></typeparam>
+/// <typeparam name="Layout"></typeparam>
+/// <typeparam name="TRng"></typeparam>
+/// <typeparam name="TDist"></typeparam>
+/// <param name="result"></param>
+/// <param name="preserve_draw"></param>
+/// <param name="rng"></param>
+/// <param name="distribution"></param>
+/// <returns></returns>
+template<class TValue, matrix_layout Layout, class TRng, class TDist>
+std::enable_if_t<std::is_floating_point_v<TValue>, matrix<TValue, Layout>&>
+random(_Inout_ matrix<TValue, Layout>& result,
+    _In_ const bool preserve_draw,
+    _In_ TRng& rng,
+    _In_ TDist& distribution);
+
+/// <summary>
+/// Create a stratified sample of a Latin unit hypercube.
+/// </summary>
+/// <typeparam name="TRng"></typeparam>
+/// <typeparam name="TDist"></typeparam>
+/// <param name="samples"></param>
+/// <param name="parameters"></param>
+/// <param name="rng"></param>
+/// <param name="distribution"></param>
+/// <returns></returns>
+template<class TRng, class TDist>
+inline matrix<typename TDist::result_type> random(
+        _In_ const std::size_t samples,
+        _In_ const std::size_t parameters,
+        _In_ const bool preserve_draw,
+        _In_ TRng&& rng,
+        _In_ TDist&& distribution) {
+    matrix<typename TDist::result_type> result(samples, parameters);
+    return random(result,
+        preserve_draw,
+        std::forward<TRng>(rng),
+        std::forward<TDist>(distribution));
+}
+
+/// <summary>
+/// Create a stratified sample of a Latin unit hypercube.
+/// </summary>
+/// <typeparam name="TRng"></typeparam>
+/// <typeparam name="TValue"></typeparam>
+/// <param name="samples"></param>
+/// <param name="parameters"></param>
+/// <param name="preserve_draw"></param>
+/// <param name="rng"></param>
+/// <returns></returns>
+template<class TValue, class TRng>
+inline std::enable_if_t<std::is_floating_point_v<TValue>, matrix<TValue>>
+random(_In_ const std::size_t samples,
+        _In_ const std::size_t parameters,
+        _In_ const bool preserve_draw,
+        _In_ TRng&& rng) {
+    matrix<TValue> result(samples, parameters);
+    return random(result,
+        preserve_draw,
+        std::forward<TRng>(rng),
+        std::uniform_real_distribution<TValue>());
+}
+
 LHS_NAMESPACE_END
 
 #include "visus/lhs/random.inl"
