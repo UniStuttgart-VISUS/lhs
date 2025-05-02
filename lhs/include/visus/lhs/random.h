@@ -369,6 +369,11 @@ random(_In_ const std::size_t samples,
 /// Creates a sample from a hypercube of zero-based indices for the specified
 /// number of expressions per parameter.
 /// </summary>
+/// <remarks>
+/// If the number of expressions per parameter is not divisible by the number
+/// of samples, a random representative is chosen from each interval by sampling
+/// a uniform integer distribution for the size of the interval.
+/// </remarks>
 /// <typeparam name="TIterator">An iterator over a range of integral numbers.
 /// </typeparam>
 /// <typeparam name="TRng">The type of the random number generator.</typeparam>
@@ -400,6 +405,11 @@ random(_In_ const std::size_t samples,
 /// Creates a sample from a hypercube of zero-based indices for the specified
 /// number of expressions per parameter.
 /// </summary>
+/// <remarks>
+/// If the number of expressions per parameter is not divisible by the number
+/// of samples, a random representative is chosen from each interval by sampling
+/// a uniform integer distribution for the size of the interval.
+/// </remarks>
 /// <typeparam name="TIterator">An iterator over a range of integral numbers.
 /// </typeparam>
 /// <typeparam name="TRng">The type of the random number generator.</typeparam>
@@ -430,6 +440,11 @@ random(_In_ const std::size_t samples,
 /// Creates a sample from a hypercube of zero-based indices for the specified
 /// number of expressions per parameter.
 /// </summary>
+/// <remarks>
+/// If the number of expressions per parameter is not divisible by the number
+/// of samples, a random representative is chosen from each interval by sampling
+/// a uniform integer distribution for the size of the interval.
+/// </remarks>
 /// <typeparam name="TSize">An integral type used to specify the number of
 /// expressions per parameter.</typeparam>
 /// <typeparam name="TRng">The type of the random number generator.</typeparam>
@@ -460,6 +475,11 @@ random(_In_ const std::size_t samples,
 /// Creates a sample from a hypercube of zero-based indices for the specified
 /// number of expressions per parameter.
 /// </summary>
+/// <remarks>
+/// If the number of expressions per parameter is not divisible by the number
+/// of samples, a random representative is chosen from each interval by sampling
+/// a uniform integer distribution for the size of the interval.
+/// </remarks>
 /// <typeparam name="TSize">An integral type used to specify the number of
 /// expressions per parameter.</typeparam>
 /// <typeparam name="TRng">The type of the random number generator.</typeparam>
