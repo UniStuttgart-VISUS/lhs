@@ -175,7 +175,7 @@ namespace test {
 
             {
                 const auto sample = lhs.row(0);
-                Assert::AreEqual(std::size_t(3), sample.size(), L"Indices for all parameters", LINE_INFO());
+                Assert::AreEqual(std::size_t(3), sample.size(), L"Values for all parameters", LINE_INFO());
                 Assert::IsTrue((sample[0] >= 0.0f) && (sample[0] <= 1.0f), L"Output in valid range", LINE_INFO());
                 Assert::IsTrue((sample[1] >= 1.0f) && (sample[1] <= 2.0f), L"Output in valid range", LINE_INFO());
                 Assert::IsTrue((sample[2] >= 2.0f) && (sample[2] <= 3.0f), L"Output in valid range", LINE_INFO());
@@ -183,7 +183,7 @@ namespace test {
 
             {
                 const auto sample = lhs.row(1);
-                Assert::AreEqual(std::size_t(3), sample.size(), L"Indices for all parameters", LINE_INFO());
+                Assert::AreEqual(std::size_t(3), sample.size(), L"Values for all parameters", LINE_INFO());
                 Assert::IsTrue((sample[0] >= 0.0f) && (sample[0] <= 1.0f), L"Output in valid range", LINE_INFO());
                 Assert::IsTrue((sample[1] >= 1.0f) && (sample[1] <= 2.0f), L"Output in valid range", LINE_INFO());
                 Assert::IsTrue((sample[2] >= 2.0f) && (sample[2] <= 3.0f), L"Output in valid range", LINE_INFO());
@@ -191,10 +191,74 @@ namespace test {
 
             {
                 const auto sample = lhs.row(2);
-                Assert::AreEqual(std::size_t(3), sample.size(), L"Indices for all parameters", LINE_INFO());
+                Assert::AreEqual(std::size_t(3), sample.size(), L"Values for all parameters", LINE_INFO());
                 Assert::IsTrue((sample[0] >= 0.0f) && (sample[0] <= 1.0f), L"Output in valid range", LINE_INFO());
                 Assert::IsTrue((sample[1] >= 1.0f) && (sample[1] <= 2.0f), L"Output in valid range", LINE_INFO());
                 Assert::IsTrue((sample[2] >= 2.0f) && (sample[2] <= 3.0f), L"Output in valid range", LINE_INFO());
+            }
+        }
+
+        TEST_METHOD(test_discrete_range) {
+            std::vector<std::size_t> parameter_expressions { 3, 42, 9 };
+            const auto lhs = random(4,
+                parameter_expressions.begin(),
+                parameter_expressions.end(),
+                std::mt19937(0),
+                std::uniform_real_distribution<float>(0.0f, 1.0f));
+
+            {
+                const auto sample = lhs.row(0);
+                Assert::AreEqual(std::size_t(3), sample.size(), L"Indices for all parameters", LINE_INFO());
+                Assert::IsTrue(sample[0] < 3, L"Output in valid range", LINE_INFO());
+                Assert::IsTrue(sample[0] < 42, L"Output in valid range", LINE_INFO());
+                Assert::IsTrue(sample[0] < 9, L"Output in valid range", LINE_INFO());
+            }
+
+            {
+                const auto sample = lhs.row(1);
+                Assert::AreEqual(std::size_t(3), sample.size(), L"Indices for all parameters", LINE_INFO());
+                Assert::IsTrue(sample[0] < 3, L"Output in valid range", LINE_INFO());
+                Assert::IsTrue(sample[0] < 42, L"Output in valid range", LINE_INFO());
+                Assert::IsTrue(sample[0] < 9, L"Output in valid range", LINE_INFO());
+            }
+
+            {
+                const auto sample = lhs.row(2);
+                Assert::AreEqual(std::size_t(3), sample.size(), L"Indices for all parameters", LINE_INFO());
+                Assert::IsTrue(sample[0] < 3, L"Output in valid range", LINE_INFO());
+                Assert::IsTrue(sample[0] < 42, L"Output in valid range", LINE_INFO());
+                Assert::IsTrue(sample[0] < 9, L"Output in valid range", LINE_INFO());
+            }
+        }
+
+        TEST_METHOD(test_discrete_range_initialiser) {
+            const auto lhs = random(4,
+                { 3, 42, 9 },
+                std::mt19937(0),
+                std::uniform_real_distribution<float>(0.0f, 1.0f));
+
+            {
+                const auto sample = lhs.row(0);
+                Assert::AreEqual(std::size_t(3), sample.size(), L"Indices for all parameters", LINE_INFO());
+                Assert::IsTrue(sample[0] < 3, L"Output in valid range", LINE_INFO());
+                Assert::IsTrue(sample[0] < 42, L"Output in valid range", LINE_INFO());
+                Assert::IsTrue(sample[0] < 9, L"Output in valid range", LINE_INFO());
+            }
+
+            {
+                const auto sample = lhs.row(1);
+                Assert::AreEqual(std::size_t(3), sample.size(), L"Indices for all parameters", LINE_INFO());
+                Assert::IsTrue(sample[0] < 3, L"Output in valid range", LINE_INFO());
+                Assert::IsTrue(sample[0] < 42, L"Output in valid range", LINE_INFO());
+                Assert::IsTrue(sample[0] < 9, L"Output in valid range", LINE_INFO());
+            }
+
+            {
+                const auto sample = lhs.row(2);
+                Assert::AreEqual(std::size_t(3), sample.size(), L"Indices for all parameters", LINE_INFO());
+                Assert::IsTrue(sample[0] < 3, L"Output in valid range", LINE_INFO());
+                Assert::IsTrue(sample[0] < 42, L"Output in valid range", LINE_INFO());
+                Assert::IsTrue(sample[0] < 9, L"Output in valid range", LINE_INFO());
             }
         }
 

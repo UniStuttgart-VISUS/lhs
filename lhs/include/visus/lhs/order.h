@@ -9,9 +9,11 @@
 #pragma once
 
 #include <algorithm>
+#include <cassert>
 #include <cstdlib>
 #include <iterator>
 #include <numeric>
+#include <type_traits>
 #include <vector>
 
 #include "visus/lhs/api.h"
@@ -115,6 +117,135 @@ inline std::vector<std::size_t> order(
         std::forward<TIterator>(end),
         std::less<value_type>());
     return retval;
+}
+
+/// <summary>
+/// Creates a order from zero to the size of <paramref name="indices" /> that is
+/// based on sampling the given <paramref name="distribution" /> using the given
+/// <paramref name="rng" />.
+/// </summary>
+/// <typeparam name="TLess">A function that determines whether which of the
+/// generated random items is smaller.</typeparam>
+/// <typeparam name="TDist">The type of the distribution to sample the random
+/// items from.</typeparam>
+/// <typeparam name="TRng">The type of the random number generator.</typeparam>
+/// <param name="indices">The buffer receiving the generated permutation. This
+/// buffer also determines the size of the permutation.</param>
+/// <param name="buffer">A working buffer to create the random numbers. This is
+/// provided to the method in order to allow callers reduce the number of
+/// reallocations required in loops using this function.</param>
+/// <param name="less">A predicate which determines which of two of the iterated
+/// items is the smaller one.</param>
+/// <param name="rng">The random number generator used to sample the given
+/// <paramref name="distribution" />.</param>
+/// <param name="distribution">The distribution to be sampled.</param>
+/// <returns><paramref name="indices" />.</returns>
+template<class TLess, class TRng, class TDist>
+std::vector<std::size_t>& random_order_by(
+    _Inout_ std::vector<std::size_t>& indices,
+    _In_ std::vector<typename TDist::result_type>& buffer,
+    _In_ TLess&& less,
+    _In_ TRng& rng,
+    _In_ TDist& distribution);
+
+/// <summary>
+/// Creates a order from zero to the size of <paramref name="indices" /> that is
+/// based on sampling the given <paramref name="distribution" /> using the given
+/// <paramref name="rng" />.
+/// </summary>
+/// <typeparam name="TDist">The type of the distribution to sample the random
+/// items from.</typeparam>
+/// <typeparam name="TRng">The type of the random number generator.</typeparam>
+/// <param name="indices">The buffer receiving the generated permutation. This
+/// buffer also determines the size of the permutation.</param>
+/// <param name="buffer">A working buffer to create the random numbers. This is
+/// provided to the method in order to allow callers reduce the number of
+/// reallocations required in loops using this function.</param>
+/// <param name="less">A predicate which determines which of two of the iterated
+/// items is the smaller one.</param>
+/// <param name="rng">The random number generator used to sample the given
+/// <paramref name="distribution" />.</param>
+/// <param name="distribution">The distribution to be sampled.</param>
+/// <returns><paramref name="indices" />.</returns>
+template<class TRng, class TDist>
+inline std::vector<std::size_t>& random_order(
+        _Inout_ std::vector<std::size_t>& indices,
+        _In_ std::vector<typename TDist::result_type>& buffer,
+        _In_ TRng& rng,
+        _In_ TDist& distribution) {
+    return random_order_by(indices,
+        buffer,
+        std::less<typename TDist::result_type>(),
+        rng,
+        distribution);
+}
+
+/// <summary>
+/// Create a random index sequence of the specified size.
+/// </summary>
+/// <remarks>
+/// The random order is determined by whatever <c>std::shuffle</c> does with
+/// the given <paramref name="rng" />.
+/// </remarks>
+/// <typeparam name="TValue">The type of the indices, which must be an integral
+/// number.</typeparam>
+/// <typeparam name="TRng">The type of the random generator to be used.
+/// </typeparam>
+/// <param name="indices">The vector receving the random sequence.</param>
+/// <param name="n">The length of the sequence.</param>
+/// <param name="rng">The random number generator.</param>
+/// <returns><paramref name="indices" />.</returns>
+template<class TValue, class TRng>
+inline std::enable_if_t<std::is_integral_v<TValue>, std::vector<TValue>&>
+random_order(_Inout_ std::vector<TValue>& indices,
+        _In_ const std::size_t n,
+        _In_ TRng&& rng) {
+    indices.resize(n);
+    std::iota(indices.begin(), indices.end(), static_cast<TValue>(0));
+    std::shuffle(indices.begin(), indices.end(), std::forward<TRng>(rng));
+    return indices;
+}
+
+/// <summary>
+/// Create a random index sequence of the specified size.
+/// </summary>
+/// <remarks>
+/// The random order is determined by whatever <c>std::shuffle</c> does with
+/// the given <paramref name="rng" />.
+/// </remarks>
+/// <typeparam name="TValue">The type of the indices, which must be an integral
+/// number.</typeparam>
+/// <typeparam name="TRng">The type of the random generator to be used.
+/// </typeparam>
+/// <param name="n">The length of the sequence.</param>
+/// <param name="rng">The random number generator.</param>
+/// <returns>A random permutation of [0, <paramref name="indices" />].</returns>
+template<class TValue, class TRng>
+inline std::enable_if_t<std::is_integral_v<TValue>, std::vector<TValue>>
+random_order(_In_ const std::size_t n, TRng&& rng) {
+    std::vector<TValue> retval;
+    return random_order(retval, n, std::forward<TRng>(rng));
+}
+
+/// <summary>
+/// Create a random index sequence of the specified size.
+/// </summary>
+/// <remarks>
+/// The random order is determined by whatever <c>std::shuffle</c> does with
+/// the given <c>std::mt19937</c> random number generator that has been
+/// initialised using the <c>std::random_device</c>.
+/// </remarks>
+/// <typeparam name="TValue">The type of the indices, which must be an integral
+/// number.</typeparam>
+/// <param name="n">The length of the sequence.</param>
+/// <returns>A random permutation of [0, <paramref name="indices" />].</returns>
+template<class TValue>
+inline std::enable_if_t<std::is_integral_v<TValue>, std::vector<TValue>>
+random_order(_In_ const std::size_t n) {
+    std::vector<TValue> retval;
+    std::random_device rd;
+    std::mt19937 rng(rd());
+    return random_order(retval, n, rng);
 }
 
 LHS_DETAIL_NAMESPACE_END

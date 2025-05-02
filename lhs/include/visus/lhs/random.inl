@@ -142,3 +142,58 @@ LHS_NAMESPACE::random(_In_ const std::size_t samples,
 
     return retval;
 }
+
+
+/*
+ * LHS_NAMESPACE::random
+ */
+template<class TIterator, class TRng, class TDist>
+std::enable_if_t<std::is_integral_v<
+    typename std::iterator_traits<TIterator>::value_type>,
+    LHS_NAMESPACE::matrix<std::size_t>>
+LHS_NAMESPACE::random(_In_ const std::size_t samples,
+        _In_ const TIterator begin,
+        _In_ const TIterator end,
+        _In_ TRng& rng,
+        _In_ TDist& distribution) {
+    typedef typename std::iterator_traits<TIterator>::value_type size_type;
+    typedef std::make_signed_t<size_type> div_type;
+
+    const auto n = static_cast<div_type>(samples);
+    const auto k = std::distance(begin, end);
+
+    matrix<std::size_t> retval(samples, k);
+    std::vector<std::size_t> indices(samples);
+    std::vector<typename TDist::result_type> values(samples);
+
+    // Implements an algorithm alike to the one proposed in
+    // https://stat.ethz.ch/pipermail/r-help/2007-January/124143.html.
+    auto it = begin;
+    for (std::size_t c = 0; c < k; ++c, ++it) {
+        assert(it != end);
+        const auto cnt = static_cast<div_type>(*it) - 1;
+        const auto div = std::div(cnt, n);
+        std::uniform_int_distribution<size_type> dist(0, div.rem);
+
+        // Create a random permutation of [0, samples[.
+        detail::random_order(indices, values, rng, distribution);
+
+        for (std::size_t r = 0; r < n; ++r) {
+            assert(it != end);
+            auto i = indices[r];
+
+            if (div.rem == 0) {
+                // The number of parameter expressions is divisible by the
+                // number of samples, so we can use the result directly.
+                retval(r, c) = i * div.quot;
+            } else {
+                // The number of parameter expressions is not divisible by the
+                // number of samples, so we need to add a random offset.
+                retval(r, c) = i * div.quot + dist(rng);
+            }
+        }
+    }
+
+    return retval;
+}
+
