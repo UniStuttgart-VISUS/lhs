@@ -108,6 +108,14 @@ public:
     }
 
     /// <summary>
+    /// Answer the memory layout of the matrix.
+    /// </summary>
+    /// <returns>The memory layout of the matrix.</returns>
+    inline constexpr matrix_layout layout(void) const noexcept {
+        return Layout;
+    }
+
+    /// <summary>
     /// Extracts a row from the matrix.
     /// </summary>
     /// <typeparam name="L">The layout of <paramref name="dst" />.</typeparam>
@@ -236,8 +244,48 @@ private:
     std::size_t _consecutive;
     std::vector<value_type> _elements;
 
+public:
+
+    /// <summary>
+    /// Gets an iterator for the begin of elements. The order of the elements
+    /// depends of the layout of the matrix.
+    /// </summary>
+    /// <returns>An iterator for the begin of the elements.</returns>
+    inline auto begin(void) noexcept -> decltype(this->_elements.begin()) {
+        return this->_elements.begin();
+    }
+
+    /// <summary>
+    /// Gets an iterator for the begin of elements. The order of the elements
+    /// depends of the layout of the matrix.
+    /// </summary>
+    /// <returns>An iterator for the begin of the elements.</returns>
+    inline auto begin(void) const noexcept
+            -> decltype(this->_elements.begin()) {
+        return this->_elements.begin();
+    }
+
+    /// <summary>
+    /// Gets an iterator for the end of elements. The order of the elements
+    /// depends of the layout of the matrix.
+    /// </summary>
+    /// <returns>An iterator for the end of the elements.</returns>
+    inline auto end(void) noexcept -> decltype(this->_elements.end()) {
+        return this->_elements.end();
+    }
+
+    /// <summary>
+    /// Gets an iterator for the end of elements. The order of the elements
+    /// depends of the layout of the matrix.
+    /// </summary>
+    /// <returns>An iterator for the end of the elements.</returns>
+    inline auto end(void) const noexcept -> decltype(this->_elements.end()) {
+        return this->_elements.end();
+    }
+
     // We are all a big family ...
     template<class, matrix_layout> friend class matrix;
+
 };
 
 LHS_NAMESPACE_END

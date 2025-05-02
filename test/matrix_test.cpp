@@ -34,8 +34,8 @@ namespace test {
             }
         }
 
-        TEST_METHOD(test_indexers) {
-            matrix<float> m(3, 4);
+        TEST_METHOD(test_indexers_row_major) {
+            matrix<float, matrix_layout::row_major> m(3, 4);
 
             m(0, 0) = 0.0f;
             m(0, 1) = 0.1f;
@@ -96,6 +96,105 @@ namespace test {
             Assert::AreEqual(2.1f, m(2, 1), L"2, 1", LINE_INFO());
             Assert::AreEqual(2.2f, m(2, 2), L"2, 2", LINE_INFO());
             Assert::AreEqual(2.3f, m(2, 3), L"2, 3", LINE_INFO());
+
+            Assert::AreEqual(int(matrix_layout::row_major), int(m.layout()), L"Matrix layout", LINE_INFO());
+
+            Assert::AreEqual(0.0f, m[0], L"0", LINE_INFO());
+            Assert::AreEqual(0.1f, m[1], L"1", LINE_INFO());
+            Assert::AreEqual(0.2f, m[2], L"2", LINE_INFO());
+            Assert::AreEqual(0.3f, m[3], L"3", LINE_INFO());
+
+            Assert::AreEqual(1.0f, m[4], L"4", LINE_INFO());
+            Assert::AreEqual(1.1f, m[5], L"5", LINE_INFO());
+            Assert::AreEqual(1.2f, m[6], L"6", LINE_INFO());
+            Assert::AreEqual(1.3f, m[7], L"7", LINE_INFO());
+
+            Assert::AreEqual(2.0f, m[8], L"8", LINE_INFO());
+            Assert::AreEqual(2.1f, m[9], L"9", LINE_INFO());
+            Assert::AreEqual(2.2f, m[10], L"10", LINE_INFO());
+            Assert::AreEqual(2.3f, m[11], L"11", LINE_INFO());
+        }
+
+        TEST_METHOD(test_indexers_colum_major) {
+            matrix<float, matrix_layout::column_major> m(3, 4);
+
+            m(0, 0) = 0.0f;
+            m(0, 1) = 0.1f;
+            m(0, 2) = 0.2f;
+            m(0, 3) = 0.3f;
+
+            Assert::AreEqual(0.0f, m(0, 0), L"0, 0", LINE_INFO());
+            Assert::AreEqual(0.1f, m(0, 1), L"0, 1", LINE_INFO());
+            Assert::AreEqual(0.2f, m(0, 2), L"0, 2", LINE_INFO());
+            Assert::AreEqual(0.3f, m(0, 3), L"0, 3", LINE_INFO());
+
+            Assert::AreEqual(0.0f, m(1, 0), L"1, 0", LINE_INFO());
+            Assert::AreEqual(0.0f, m(1, 1), L"1, 1", LINE_INFO());
+            Assert::AreEqual(0.0f, m(1, 2), L"1, 2", LINE_INFO());
+            Assert::AreEqual(0.0f, m(1, 3), L"1, 3", LINE_INFO());
+
+            Assert::AreEqual(0.0f, m(2, 0), L"2, 0", LINE_INFO());
+            Assert::AreEqual(0.0f, m(2, 1), L"2, 1", LINE_INFO());
+            Assert::AreEqual(0.0f, m(2, 2), L"2, 2", LINE_INFO());
+            Assert::AreEqual(0.0f, m(2, 3), L"2, 3", LINE_INFO());
+
+            m(1, 0) = 1.0f;
+            m(1, 1) = 1.1f;
+            m(1, 2) = 1.2f;
+            m(1, 3) = 1.3f;
+
+            Assert::AreEqual(0.0f, m(0, 0), L"0, 0", LINE_INFO());
+            Assert::AreEqual(0.1f, m(0, 1), L"0, 1", LINE_INFO());
+            Assert::AreEqual(0.2f, m(0, 2), L"0, 2", LINE_INFO());
+            Assert::AreEqual(0.3f, m(0, 3), L"0, 3", LINE_INFO());
+
+            Assert::AreEqual(1.0f, m(1, 0), L"1, 0", LINE_INFO());
+            Assert::AreEqual(1.1f, m(1, 1), L"1, 1", LINE_INFO());
+            Assert::AreEqual(1.2f, m(1, 2), L"1, 2", LINE_INFO());
+            Assert::AreEqual(1.3f, m(1, 3), L"1, 3", LINE_INFO());
+
+            Assert::AreEqual(0.0f, m(2, 0), L"2, 0", LINE_INFO());
+            Assert::AreEqual(0.0f, m(2, 1), L"2, 1", LINE_INFO());
+            Assert::AreEqual(0.0f, m(2, 2), L"2, 2", LINE_INFO());
+            Assert::AreEqual(0.0f, m(2, 3), L"2, 3", LINE_INFO());
+
+            m(2, 0) = 2.0f;
+            m(2, 1) = 2.1f;
+            m(2, 2) = 2.2f;
+            m(2, 3) = 2.3f;
+
+            Assert::AreEqual(0.0f, m(0, 0), L"0, 0", LINE_INFO());
+            Assert::AreEqual(0.1f, m(0, 1), L"0, 1", LINE_INFO());
+            Assert::AreEqual(0.2f, m(0, 2), L"0, 2", LINE_INFO());
+            Assert::AreEqual(0.3f, m(0, 3), L"0, 3", LINE_INFO());
+
+            Assert::AreEqual(1.0f, m(1, 0), L"1, 0", LINE_INFO());
+            Assert::AreEqual(1.1f, m(1, 1), L"1, 1", LINE_INFO());
+            Assert::AreEqual(1.2f, m(1, 2), L"1, 2", LINE_INFO());
+            Assert::AreEqual(1.3f, m(1, 3), L"1, 3", LINE_INFO());
+
+            Assert::AreEqual(2.0f, m(2, 0), L"2, 0", LINE_INFO());
+            Assert::AreEqual(2.1f, m(2, 1), L"2, 1", LINE_INFO());
+            Assert::AreEqual(2.2f, m(2, 2), L"2, 2", LINE_INFO());
+            Assert::AreEqual(2.3f, m(2, 3), L"2, 3", LINE_INFO());
+
+            Assert::AreEqual(int(matrix_layout::column_major), int(m.layout()), L"Matrix layout", LINE_INFO());
+
+            Assert::AreEqual(0.0f, m[0], L"0", LINE_INFO());
+            Assert::AreEqual(1.0f, m[1], L"1", LINE_INFO());
+            Assert::AreEqual(2.0f, m[2], L"2", LINE_INFO());
+
+            Assert::AreEqual(0.1f, m[3], L"3", LINE_INFO());
+            Assert::AreEqual(1.1f, m[4], L"4", LINE_INFO());
+            Assert::AreEqual(2.1f, m[5], L"5", LINE_INFO());
+
+            Assert::AreEqual(0.2f, m[6], L"6", LINE_INFO());
+            Assert::AreEqual(1.2f, m[7], L"7", LINE_INFO());
+            Assert::AreEqual(2.2f, m[8], L"8", LINE_INFO());
+
+            Assert::AreEqual(0.3f, m[9], L"9", LINE_INFO());
+            Assert::AreEqual(1.3f, m[10], L"10", LINE_INFO());
+            Assert::AreEqual(2.3f, m[11], L"11", LINE_INFO());
         }
 
         TEST_METHOD(test_fill) {

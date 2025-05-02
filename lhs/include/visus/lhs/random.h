@@ -13,6 +13,7 @@
 
 #include "visus/lhs/matrix.h"
 #include "visus/lhs/order.h"
+#include "visus/lhs/range.h"
 
 
 LHS_NAMESPACE_BEGIN
@@ -59,7 +60,7 @@ inline matrix<std::size_t, Layout>& random(
         _In_ TRng&& rng) {
     return random(result,
         std::forward<TRng>(rng),
-        std::uniform_real_distribution<float>(0.0f, 1.0f));
+        std::uniform_real_distribution<float>());
 }
 
 /// <summary>
@@ -112,21 +113,27 @@ inline matrix<std::size_t> random(
     matrix<std::size_t> result(samples, parameters);
     return random(result,
         std::forward<TRng>(rng),
-        std::uniform_real_distribution<float>(0.0f, 1.0f));
+        std::uniform_real_distribution<float>());
 }
 
 /// <summary>
-/// Create a stratified sample of a Latin unit hypercube.
+/// Fill <paramref name="result" /> with a (uniformly distributed) stratified
+/// sample from unit hypercube.
 /// </summary>
-/// <typeparam name="TValue"></typeparam>
-/// <typeparam name="Layout"></typeparam>
-/// <typeparam name="TRng"></typeparam>
-/// <typeparam name="TDist"></typeparam>
+/// <typeparam name="TValue">The type of values to be created, which must be a
+/// floating point type.</typeparam>
+/// <typeparam name="Layout">The memory layout of the matrix.</typeparam>
+/// <typeparam name="TRng">The type of the random number generator.</typeparam>
+/// <typeparam name="TDist">The type of the distribution used to generate random
+/// numbers.</typeparam>
 /// <param name="result"></param>
 /// <param name="preserve_draw"></param>
-/// <param name="rng"></param>
-/// <param name="distribution"></param>
-/// <returns></returns>
+/// <param name="rng">The random number generator used to sample the given
+/// <paramref name"="distribution" />.</param>
+/// <param name="distribution">The distribution to draw samples from, which
+/// typically is a uniform real distribution creating numbers within [0, 1].
+/// </param>
+/// <returns><paramref name="result" />.</returns>
 template<class TValue, matrix_layout Layout, class TRng, class TDist>
 std::enable_if_t<std::is_floating_point_v<TValue>, matrix<TValue, Layout>&>
 random(_Inout_ matrix<TValue, Layout>& result,
@@ -135,14 +142,18 @@ random(_Inout_ matrix<TValue, Layout>& result,
     _In_ TDist& distribution);
 
 /// <summary>
-/// Create a stratified sample of a Latin unit hypercube.
+/// Create a (uniformly distributed) stratified sample from unit hypercube.
 /// </summary>
-/// <typeparam name="TRng"></typeparam>
-/// <typeparam name="TDist"></typeparam>
+/// <typeparam name="TRng">The type of the random number generator.</typeparam>
+/// <typeparam name="TDist">The type of the distribution used to generate random
+/// numbers.</typeparam>
 /// <param name="samples"></param>
 /// <param name="parameters"></param>
-/// <param name="rng"></param>
-/// <param name="distribution"></param>
+/// <param name="rng">The random number generator used to sample the given
+/// <paramref name"="distribution" />.</param>
+/// <param name="distribution">The distribution to draw samples from, which
+/// typically is a uniform real distribution creating numbers within [0, 1].
+/// </param>
 /// <returns></returns>
 template<class TRng, class TDist>
 inline matrix<typename TDist::result_type> random(
@@ -159,14 +170,16 @@ inline matrix<typename TDist::result_type> random(
 }
 
 /// <summary>
-/// Create a stratified sample of a Latin unit hypercube.
+/// Create a uniformly distributed stratified sample from unit hypercube.
 /// </summary>
-/// <typeparam name="TRng"></typeparam>
-/// <typeparam name="TValue"></typeparam>
+/// <typeparam name="TValue">The type of values to be created, which must be a
+/// floating point type.</typeparam>
+/// <typeparam name="TRng">The type of the random number generator.</typeparam>
 /// <param name="samples"></param>
 /// <param name="parameters"></param>
 /// <param name="preserve_draw"></param>
-/// <param name="rng"></param>
+/// <param name="rng">The random number generator used to sample a uniform
+/// real distribution within [0, 1].</param>
 /// <returns></returns>
 template<class TValue, class TRng>
 inline std::enable_if_t<std::is_floating_point_v<TValue>, matrix<TValue>>
