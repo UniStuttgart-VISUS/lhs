@@ -370,9 +370,9 @@ random(_In_ const std::size_t samples,
 /// number of expressions per parameter.
 /// </summary>
 /// <remarks>
-/// If the number of expressions per parameter is not divisible by the number
-/// of samples, a random representative is chosen from each interval by sampling
-/// a uniform integer distribution for the size of the interval.
+/// The per-parameter expressions are bucketed into <paramref name="samples" />
+/// buckets. Each of the buckets is used once and the representative is chosen
+/// randomly using a uniform integer distribution.
 /// </remarks>
 /// <typeparam name="TIterator">An iterator over a range of integral numbers.
 /// </typeparam>
@@ -406,9 +406,9 @@ random(_In_ const std::size_t samples,
 /// number of expressions per parameter.
 /// </summary>
 /// <remarks>
-/// If the number of expressions per parameter is not divisible by the number
-/// of samples, a random representative is chosen from each interval by sampling
-/// a uniform integer distribution for the size of the interval.
+/// The per-parameter expressions are bucketed into <paramref name="samples" />
+/// buckets. Each of the buckets is used once and the representative is chosen
+/// randomly using a uniform integer distribution.
 /// </remarks>
 /// <typeparam name="TIterator">An iterator over a range of integral numbers.
 /// </typeparam>
@@ -441,9 +441,9 @@ random(_In_ const std::size_t samples,
 /// number of expressions per parameter.
 /// </summary>
 /// <remarks>
-/// If the number of expressions per parameter is not divisible by the number
-/// of samples, a random representative is chosen from each interval by sampling
-/// a uniform integer distribution for the size of the interval.
+/// The per-parameter expressions are bucketed into <paramref name="samples" />
+/// buckets. Each of the buckets is used once and the representative is chosen
+/// randomly using a uniform integer distribution.
 /// </remarks>
 /// <typeparam name="TSize">An integral type used to specify the number of
 /// expressions per parameter.</typeparam>
@@ -476,9 +476,9 @@ random(_In_ const std::size_t samples,
 /// number of expressions per parameter.
 /// </summary>
 /// <remarks>
-/// If the number of expressions per parameter is not divisible by the number
-/// of samples, a random representative is chosen from each interval by sampling
-/// a uniform integer distribution for the size of the interval.
+/// The per-parameter expressions are bucketed into <paramref name="samples" />
+/// buckets. Each of the buckets is used once and the representative is chosen
+/// randomly using a uniform integer distribution.
 /// </remarks>
 /// <typeparam name="TSize">An integral type used to specify the number of
 /// expressions per parameter.</typeparam>

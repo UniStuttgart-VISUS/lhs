@@ -173,7 +173,6 @@ LHS_NAMESPACE::random(_In_ const std::size_t samples,
         assert(it != end);
         const auto cnt = static_cast<div_type>(*it) - 1;
         const auto div = std::div(cnt, n);
-        std::uniform_int_distribution<size_type> dist(0, div.rem);
 
         // Create a random permutation of [0, samples[.
         detail::random_order(indices, values, rng, distribution);
@@ -182,14 +181,23 @@ LHS_NAMESPACE::random(_In_ const std::size_t samples,
             assert(it != end);
             auto i = indices[r];
 
-            if (div.rem == 0) {
+            if ((div.rem == 0) || (i > div.rem)) {
                 // The number of parameter expressions is divisible by the
-                // number of samples, so we can use the result directly.
-                retval(r, c) = i * div.quot;
+                // number of samples, or alternatively, we are not in the
+                // first 'div.rem' samples that have one additional element.
+                auto start = i * div.quot;
+                auto end = start + div.quot;
+                std::uniform_int_distribution<size_type> dist(start, end);
+                retval(r, c) = dist(rng);
+
             } else {
                 // The number of parameter expressions is not divisible by the
-                // number of samples, so we need to add a random offset.
-                retval(r, c) = i * div.quot + dist(rng);
+                // number of samples and we are in the first 'div.rem' cases
+                // that have an additional item.
+                auto start = i * div.quot;
+                auto end = start + div.quot + 1;
+                std::uniform_int_distribution<size_type> dist(start, end);
+                retval(r, c) = dist(rng);
             }
         }
     }
