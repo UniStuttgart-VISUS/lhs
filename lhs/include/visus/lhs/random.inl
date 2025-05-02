@@ -103,3 +103,42 @@ LHS_NAMESPACE::random(_Inout_ matrix<TValue, Layout>& result,
 
     return result;
 }
+
+
+/*
+ * LHS_NAMESPACE::random
+ */
+template<class TIterator, class TRng, class TDist>
+std::enable_if_t<
+    std::is_floating_point_v<
+        typename std::iterator_traits<TIterator>::value_type::value_type>,
+    LHS_NAMESPACE::matrix<
+        typename std::iterator_traits<TIterator>::value_type::value_type>>
+LHS_NAMESPACE::random(_In_ const std::size_t samples,
+        _In_ const TIterator begin,
+        _In_ const TIterator end,
+        _In_ const bool preserve_draw,
+        _In_ TRng&& rng,
+        _In_ TDist&& distribution) {
+    using value_type
+        = typename std::iterator_traits<TIterator>::value_type::value_type;
+    matrix<value_type> retval(samples, std::distance(begin, end));
+
+    // Create random samples within [0, 1].
+    random(retval,
+        preserve_draw,
+        std::forward<TRng>(rng),
+        std::forward<TDist>(distribution));
+
+    // Scale the samples to the ranges defined by the parameters like suggested
+    // in https://stat.ethz.ch/pipermail/r-help/2007-January/124143.html.
+    for (std::size_t r = 0; r < samples; ++r) {
+        std::size_t c = 0;
+
+        for (auto it = begin; it != end; ++it, ++c) {
+            retval(r, c) = it->begin() + it->distance() * retval(r, c);
+        }
+    }
+
+    return retval;
+}

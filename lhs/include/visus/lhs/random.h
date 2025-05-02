@@ -8,6 +8,8 @@
 #define _LHS_RANDOM_H
 #pragma once
 
+#include <initializer_list>
+#include <iterator>
 #include <random>
 #include <type_traits>
 
@@ -21,7 +23,9 @@ LHS_NAMESPACE_BEGIN
 /// <summary>
 /// Fill <paramref name="result" /> with a Latin Hypercube sample.
 /// </summary>
-/// <typeparam name="Layout">The memory layout of the matrix.</typeparam>
+/// <typeparam name="Layout">The memory layout of the matrix. It is reasonable
+/// to use row-major matrices here, because in this case, the parameter values
+/// for a sample are laid out contiguously in memory.</typeparam>
 /// <typeparam name="TRng">The type of the random number generator.</typeparam>
 /// <typeparam name="TDist">The type of the distribution used to generate random
 /// numbers.</typeparam>
@@ -45,7 +49,9 @@ matrix<std::size_t, Layout>& random(
 /// <summary>
 /// Fill <paramref name="result" /> with a Latin Hypercube sample.
 /// </summary>
-/// <typeparam name="Layout">The memory layout of the matrix.</typeparam>
+/// <typeparam name="Layout">The memory layout of the matrix. It is reasonable
+/// to use row-major matrices here, because in this case, the parameter values
+/// for a sample are laid out contiguously in memory.</typeparam>
 /// <typeparam name="TRng">The type of the random number generator.</typeparam>
 /// <param name="result">The matrix to receive the Latin Hypercube sample. The
 /// values are ignored on entry. However, the number of rows represents the
@@ -122,7 +128,9 @@ inline matrix<std::size_t> random(
 /// </summary>
 /// <typeparam name="TValue">The type of values to be created, which must be a
 /// floating point type.</typeparam>
-/// <typeparam name="Layout">The memory layout of the matrix.</typeparam>
+/// <typeparam name="Layout">The memory layout of the matrix. It is reasonable
+/// to use row-major matrices here, because in this case, the parameter values
+/// for a sample are laid out contiguously in memory.</typeparam>
 /// <typeparam name="TRng">The type of the random number generator.</typeparam>
 /// <typeparam name="TDist">The type of the distribution used to generate random
 /// numbers.</typeparam>
@@ -192,6 +200,91 @@ random(_In_ const std::size_t samples,
         preserve_draw,
         std::forward<TRng>(rng),
         std::uniform_real_distribution<TValue>());
+}
+
+/// <summary>
+/// 
+/// </summary>
+/// <typeparam name="TIterator">An iterator over the parameter
+/// <paramref name="range{TValue}" />s. The elements iterated by this
+/// type must be floating-point numbers.</typeparam>
+/// <typeparam name="TRng"></typeparam>
+/// <typeparam name="TDist"></typeparam>
+/// <param name="samples"></param>
+/// <param name="begin"></param>
+/// <param name="end"></param>
+/// <param name="preserve_draw"></param>
+/// <param name="rng"></param>
+/// <param name="distribution"></param>
+/// <returns></returns>
+template<class TIterator, class TRng, class TDist>
+std::enable_if_t<
+    std::is_floating_point_v<
+        typename std::iterator_traits<TIterator>::value_type::value_type>,
+    matrix<typename std::iterator_traits<TIterator>::value_type::value_type>>
+random(_In_ const std::size_t samples,
+    _In_ const TIterator begin,
+    _In_ const TIterator end,
+    _In_ const bool preserve_draw,
+    _In_ TRng&& rng,
+    _In_ TDist&& distribution);
+
+/// <summary>
+/// 
+/// </summary>
+/// <typeparam name="TIterator"></typeparam>
+/// <typeparam name="TRng"></typeparam>
+/// <param name="samples"></param>
+/// <param name="begin"></param>
+/// <param name="end"></param>
+/// <param name="preserve_draw"></param>
+/// <param name="rng"></param>
+/// <param name="distribution"></param>
+/// <returns></returns>
+template<class TIterator, class TRng>
+inline std::enable_if_t<
+    std::is_floating_point_v<
+        typename std::iterator_traits<TIterator>::value_type::value_type>,
+    matrix<typename std::iterator_traits<TIterator>::value_type::value_type>>
+random(_In_ const std::size_t samples,
+        _In_ TIterator&& begin,
+        _In_ TIterator&& end,
+        _In_ const bool preserve_draw,
+        _In_ TRng&& rng) {
+    using value_type = typename TIterator::value_type::value_type;
+    return random(samples,
+        std::forward<TIterator>(begin),
+        std::forward<TIterator>(end),
+        preserve_draw,
+        std::forward<TRng>(rng),
+        std::uniform_real_distribution<value_type>());
+}
+
+/// <summary>
+/// 
+/// </summary>
+/// <typeparam name="TValue"></typeparam>
+/// <typeparam name="TRng"></typeparam>
+/// <typeparam name="TDist"></typeparam>
+/// <param name="samples"></param>
+/// <param name="parameters"></param>
+/// <param name="preserve_draw"></param>
+/// <param name="rng"></param>
+/// <param name="distribution"></param>
+/// <returns></returns>
+template<class TValue, class TRng, class TDist>
+std::enable_if_t< std::is_floating_point_v<TValue>, matrix<typename TValue>>
+random(_In_ const std::size_t samples,
+        _In_ const std::initializer_list<range<TValue>>& parameters,
+        _In_ const bool preserve_draw,
+        _In_ TRng&& rng,
+        _In_ TDist&& distribution) {
+    return random(samples,
+        parameters.begin(),
+        parameters.end(),
+        preserve_draw,
+        std::forward<TRng>(rng),
+        std::forward<TDist>(distribution));
 }
 
 LHS_NAMESPACE_END
