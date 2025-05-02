@@ -372,7 +372,9 @@ random(_In_ const std::size_t samples,
 /// <remarks>
 /// The per-parameter expressions are bucketed into <paramref name="samples" />
 /// buckets. Each of the buckets is used once and the representative is chosen
-/// randomly using a uniform integer distribution.
+/// randomly using a uniform integer distribution. Therefore, the samlples will
+/// not be fully evenly selected if the number of expressions is not divisible
+/// by the sample size.
 /// </remarks>
 /// <typeparam name="TIterator">An iterator over a range of integral numbers.
 /// </typeparam>
@@ -408,7 +410,9 @@ random(_In_ const std::size_t samples,
 /// <remarks>
 /// The per-parameter expressions are bucketed into <paramref name="samples" />
 /// buckets. Each of the buckets is used once and the representative is chosen
-/// randomly using a uniform integer distribution.
+/// randomly using a uniform integer distribution. Therefore, the samlples will
+/// not be fully evenly selected if the number of expressions is not divisible
+/// by the sample size.
 /// </remarks>
 /// <typeparam name="TIterator">An iterator over a range of integral numbers.
 /// </typeparam>
@@ -443,7 +447,9 @@ random(_In_ const std::size_t samples,
 /// <remarks>
 /// The per-parameter expressions are bucketed into <paramref name="samples" />
 /// buckets. Each of the buckets is used once and the representative is chosen
-/// randomly using a uniform integer distribution.
+/// randomly using a uniform integer distribution. Therefore, the samlples will
+/// not be fully evenly selected if the number of expressions is not divisible
+/// by the sample size.
 /// </remarks>
 /// <typeparam name="TSize">An integral type used to specify the number of
 /// expressions per parameter.</typeparam>
@@ -478,7 +484,9 @@ random(_In_ const std::size_t samples,
 /// <remarks>
 /// The per-parameter expressions are bucketed into <paramref name="samples" />
 /// buckets. Each of the buckets is used once and the representative is chosen
-/// randomly using a uniform integer distribution.
+/// randomly using a uniform integer distribution. Therefore, the samlples will
+/// not be fully evenly selected if the number of expressions is not divisible
+/// by the sample size.
 /// </remarks>
 /// <typeparam name="TSize">An integral type used to specify the number of
 /// expressions per parameter.</typeparam>
