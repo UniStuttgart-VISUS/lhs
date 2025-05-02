@@ -203,7 +203,8 @@ random(_In_ const std::size_t samples,
 }
 
 /// <summary>
-/// 
+/// Create a (uniformly distributed) stratified sample from a hypercube with
+/// the given parameter <see cref="range{TValue}" />s.
 /// </summary>
 /// <typeparam name="TIterator">An iterator over the parameter
 /// <paramref name="range{TValue}" />s. The elements iterated by this
@@ -230,7 +231,8 @@ random(_In_ const std::size_t samples,
     _In_ TDist&& distribution);
 
 /// <summary>
-/// 
+/// Create a uniformly distributed stratified sample from a hypercube with
+/// the given parameter <see cref="range{TValue}" />s.
 /// </summary>
 /// <typeparam name="TIterator"></typeparam>
 /// <typeparam name="TRng"></typeparam>
@@ -251,7 +253,8 @@ random(_In_ const std::size_t samples,
         _In_ TIterator&& end,
         _In_ const bool preserve_draw,
         _In_ TRng&& rng) {
-    using value_type = typename TIterator::value_type::value_type;
+    typedef typename std::iterator_traits<TIterator>::value_type range_type;
+    typedef typename range_type::value_type value_type;
     return random(samples,
         std::forward<TIterator>(begin),
         std::forward<TIterator>(end),
@@ -261,7 +264,8 @@ random(_In_ const std::size_t samples,
 }
 
 /// <summary>
-/// 
+/// Create a (uniformly distributed) stratified sample from a hypercube with
+/// the given parameter <see cref="range{TValue}" />s.
 /// </summary>
 /// <typeparam name="TValue"></typeparam>
 /// <typeparam name="TRng"></typeparam>
@@ -273,7 +277,9 @@ random(_In_ const std::size_t samples,
 /// <param name="distribution"></param>
 /// <returns></returns>
 template<class TValue, class TRng, class TDist>
-std::enable_if_t< std::is_floating_point_v<TValue>, matrix<typename TValue>>
+inline std::enable_if_t<
+    std::is_floating_point_v<TValue>,
+    matrix<typename TValue>>
 random(_In_ const std::size_t samples,
         _In_ const std::initializer_list<range<TValue>>& parameters,
         _In_ const bool preserve_draw,
@@ -285,6 +291,33 @@ random(_In_ const std::size_t samples,
         preserve_draw,
         std::forward<TRng>(rng),
         std::forward<TDist>(distribution));
+}
+
+/// <summary>
+/// Create a uniformly distributed stratified sample from a hypercube with
+/// the given parameter <see cref="range{TValue}" />s.
+/// </summary>
+/// <typeparam name="TValue"></typeparam>
+/// <typeparam name="TRng"></typeparam>
+/// <param name="samples"></param>
+/// <param name="parameters"></param>
+/// <param name="preserve_draw"></param>
+/// <param name="rng"></param>
+/// <returns></returns>
+template<class TValue, class TRng, class TDist>
+inline std::enable_if_t<
+    std::is_floating_point_v<TValue>,
+    matrix<typename TValue>>
+random(_In_ const std::size_t samples,
+        _In_ const std::initializer_list<range<TValue>>& parameters,
+        _In_ const bool preserve_draw,
+        _In_ TRng&& rng) {
+    return random(samples,
+        parameters.begin(),
+        parameters.end(),
+        preserve_draw,
+        std::forward<TRng>(rng),
+        std::uniform_real_distribution<TValue>());
 }
 
 LHS_NAMESPACE_END

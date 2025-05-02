@@ -120,8 +120,8 @@ LHS_NAMESPACE::random(_In_ const std::size_t samples,
         _In_ const bool preserve_draw,
         _In_ TRng&& rng,
         _In_ TDist&& distribution) {
-    using value_type
-        = typename std::iterator_traits<TIterator>::value_type::value_type;
+    typedef typename std::iterator_traits<TIterator>::value_type range_type;
+    typedef typename range_type::value_type value_type;
     matrix<value_type> retval(samples, std::distance(begin, end));
 
     // Create random samples within [0, 1].
