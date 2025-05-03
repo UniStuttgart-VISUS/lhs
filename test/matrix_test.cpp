@@ -367,6 +367,52 @@ namespace test {
                 Assert::AreEqual(2.1f, c(2, 0), L"2, 2", LINE_INFO());
             }
         }
+
+        TEST_METHOD(test_diagonal) {
+            auto m = matrix<float>::diagonal(4, 42.0f);
+            Assert::AreEqual(42.0f, m(0, 0), L"0, 0", LINE_INFO());
+            Assert::AreEqual(0.0f, m(0, 1), L"0, 1", LINE_INFO());
+            Assert::AreEqual(0.0f, m(0, 2), L"0, 2", LINE_INFO());
+            Assert::AreEqual(0.0f, m(0, 3), L"0, 3", LINE_INFO());
+
+            Assert::AreEqual(0.0f, m(1, 0), L"1, 0", LINE_INFO());
+            Assert::AreEqual(42.0f, m(1, 1), L"1, 1", LINE_INFO());
+            Assert::AreEqual(0.0f, m(1, 2), L"1, 2", LINE_INFO());
+            Assert::AreEqual(0.0f, m(1, 3), L"1, 3", LINE_INFO());
+
+            Assert::AreEqual(0.0f, m(2, 0), L"2, 0", LINE_INFO());
+            Assert::AreEqual(0.0f, m(2, 1), L"2, 1", LINE_INFO());
+            Assert::AreEqual(42.0f, m(2, 2), L"2, 2", LINE_INFO());
+            Assert::AreEqual(0.0f, m(2, 3), L"2, 3", LINE_INFO());
+
+            Assert::AreEqual(0.0f, m(3, 0), L"3, 0", LINE_INFO());
+            Assert::AreEqual(0.0f, m(3, 1), L"3, 1", LINE_INFO());
+            Assert::AreEqual(0.0f, m(3, 2), L"3, 2", LINE_INFO());
+            Assert::AreEqual(42.0f, m(3, 3), L"3, 3", LINE_INFO());
+        }
+
+        TEST_METHOD(test_identity) {
+            auto m = matrix<float>::identity(4);
+            Assert::AreEqual(1.0f, m(0, 0), L"0, 0", LINE_INFO());
+            Assert::AreEqual(0.0f, m(0, 1), L"0, 1", LINE_INFO());
+            Assert::AreEqual(0.0f, m(0, 2), L"0, 2", LINE_INFO());
+            Assert::AreEqual(0.0f, m(0, 3), L"0, 3", LINE_INFO());
+
+            Assert::AreEqual(0.0f, m(1, 0), L"1, 0", LINE_INFO());
+            Assert::AreEqual(1.0f, m(1, 1), L"1, 1", LINE_INFO());
+            Assert::AreEqual(0.0f, m(1, 2), L"1, 2", LINE_INFO());
+            Assert::AreEqual(0.0f, m(1, 3), L"1, 3", LINE_INFO());
+
+            Assert::AreEqual(0.0f, m(2, 0), L"2, 0", LINE_INFO());
+            Assert::AreEqual(0.0f, m(2, 1), L"2, 1", LINE_INFO());
+            Assert::AreEqual(1.0f, m(2, 2), L"2, 2", LINE_INFO());
+            Assert::AreEqual(0.0f, m(2, 3), L"2, 3", LINE_INFO());
+
+            Assert::AreEqual(0.0f, m(3, 0), L"3, 0", LINE_INFO());
+            Assert::AreEqual(0.0f, m(3, 1), L"3, 1", LINE_INFO());
+            Assert::AreEqual(0.0f, m(3, 2), L"3, 2", LINE_INFO());
+            Assert::AreEqual(1.0f, m(3, 3), L"3, 3", LINE_INFO());
+        }
     };
 
 }

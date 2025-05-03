@@ -10,6 +10,7 @@
 
 using namespace Microsoft::VisualStudio::CppUnitTestFramework;
 using namespace visus::lhs;
+using namespace visus::lhs::detail;
 
 
 namespace test {
@@ -18,6 +19,8 @@ namespace test {
 
         TEST_METHOD(test_indices) {
             const auto lhs = random(4, 3, std::mt19937(0), std::uniform_real_distribution<float>(0.0f, 1.0f));
+
+            Assert::IsTrue(valid(lhs), L"Sample is valid", LINE_INFO());
 
             {
                 const auto sample = lhs.row(0);
@@ -47,6 +50,8 @@ namespace test {
         TEST_METHOD(test_unit) {
             const auto lhs = random(4, 3, false, std::mt19937(0), std::uniform_real_distribution<float>(0.0f, 1.0f));
 
+            Assert::IsTrue(valid(lhs), L"Sample is valid", LINE_INFO());
+
             {
                 const auto sample = lhs.row(0);
                 Assert::AreEqual(std::size_t(3), sample.size(), L"Indices for all parameters", LINE_INFO());
@@ -75,6 +80,8 @@ namespace test {
         TEST_METHOD(test_unit_preserve_draw) {
             const auto lhs = random(4, 3, true, std::mt19937(0), std::uniform_real_distribution<float>(0.0f, 1.0f));
 
+            Assert::IsTrue(valid(lhs), L"Sample is valid", LINE_INFO());
+
             {
                 const auto sample = lhs.row(0);
                 Assert::AreEqual(std::size_t(3), sample.size(), L"Indices for all parameters", LINE_INFO());
@@ -102,6 +109,8 @@ namespace test {
 
         TEST_METHOD(test_unit_preserve_draw_uniform) {
             const auto lhs = random<float>(4, 3, true, std::mt19937(0));
+
+            Assert::IsTrue(valid(lhs), L"Sample is valid", LINE_INFO());
 
             {
                 const auto sample = lhs.row(0);

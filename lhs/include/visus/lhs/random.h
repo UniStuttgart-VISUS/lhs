@@ -19,6 +19,7 @@
 #include "visus/lhs/is_iterable.h"
 #include "visus/lhs/order.h"
 #include "visus/lhs/range.h"
+#include "visus/lhs/valid.h"
 
 
 LHS_NAMESPACE_BEGIN

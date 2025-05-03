@@ -44,6 +44,24 @@ public:
     typedef TValue value_type;
 
     /// <summary>
+    /// Create a diagonal matrix with the given size.
+    /// </summary>
+    /// <param name="size">The number of rows and columns of the matrix.</param>
+    /// <param name="value">The value on the diagonal.</param>
+    /// <returns>A diagonal matrix.</returns>
+    static constexpr matrix diagonal(_In_ const std::size_t size,
+        _In_ const value_type value);
+
+    /// <summary>
+    /// Create an identity matrix with the given size.
+    /// </summary>
+    /// <param name="size">The number of rows and columns of the matrix.</param>
+    /// <returns>An identity matrix.</returns>
+    static inline constexpr matrix identity(_In_ const std::size_t size) {
+        return diagonal(size, static_cast<value_type>(1));
+    }
+
+    /// <summary>
     /// Initialises a new instance.
     /// </summary>
     /// <param name="rows">The number of rows in the matrix.</param>

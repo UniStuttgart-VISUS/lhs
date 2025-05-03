@@ -6,6 +6,24 @@
 
 
 /*
+ * matrix<TValue, Layout>::diagonal
+ */
+template<class TValue, LHS_NAMESPACE::matrix_layout Layout>
+constexpr LHS_NAMESPACE::matrix<TValue, Layout>
+LHS_NAMESPACE::matrix<TValue, Layout>::diagonal(
+        _In_ const std::size_t size,
+        _In_ const value_type value) {
+    matrix retval(size, size, static_cast<value_type>(0));
+
+    for (std::size_t i = 0; i < size; ++i) {
+        retval(i, i) = value;
+    }
+
+    return retval;
+}
+
+
+/*
  * LHS_NAMESPACE::matrix<TValue, Layout>::column
  */
 template<class TValue, LHS_NAMESPACE::matrix_layout Layout>

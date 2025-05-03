@@ -30,6 +30,7 @@ LHS_NAMESPACE::matrix<std::size_t, Layout>& LHS_NAMESPACE::random(
         }
     }
 
+    ASSERT_VALID_LHS(result);
     return result;
 }
 
@@ -101,6 +102,7 @@ LHS_NAMESPACE::random(_Inout_ matrix<TValue, Layout>& result,
         }
     } /* if (preserve_draw) */
 
+    ASSERT_VALID_LHS(result);
     return result;
 }
 
