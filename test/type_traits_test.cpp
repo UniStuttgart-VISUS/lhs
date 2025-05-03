@@ -11,6 +11,7 @@
 #include <CppUnitTest.h>
 
 #include "visus/lhs/is_iterable.h"
+#include "visus/lhs/is_range.h"
 #include "visus/lhs/matrix.h"
 
 using namespace Microsoft::VisualStudio::CppUnitTestFramework;
@@ -30,6 +31,12 @@ namespace test {
             Assert::IsFalse(is_iterable_v<int>, L"int", LINE_INFO());
         }
 
+        TEST_METHOD(test_is_range) {
+            Assert::IsTrue(is_range_v<range<float>>, L"range<float>", LINE_INFO());
+            Assert::IsTrue(is_range_v<range<int>>, L"range<int>", LINE_INFO());
+            Assert::IsFalse(is_range_v<float>, L"float", LINE_INFO());
+            Assert::IsFalse(is_range_v<int>, L"int", LINE_INFO());
+        }
     };
 
 }
