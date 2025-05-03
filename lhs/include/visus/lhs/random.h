@@ -371,11 +371,10 @@ random(_In_ const std::size_t samples,
 /// number of expressions per parameter.
 /// </summary>
 /// <remarks>
-/// The per-parameter expressions are bucketed into <paramref name="samples" />
-/// buckets. Each of the buckets is used once and the representative is chosen
-/// randomly using a uniform integer distribution. Therefore, the samlples will
-/// not be fully evenly selected if the number of expressions is not divisible
-/// by the sample size.
+/// This function is intended for application cases where the parameters are
+/// categorical and have different numbers of expressions. The resulting matrix
+/// will hold the zero-based index of the category. Note that the distribution
+/// of the samples might suffer from rounding errors.
 /// </remarks>
 /// <typeparam name="TIterator">An iterator over a range of integral numbers.
 /// </typeparam>
@@ -409,11 +408,10 @@ random(_In_ const std::size_t samples,
 /// number of expressions per parameter.
 /// </summary>
 /// <remarks>
-/// The per-parameter expressions are bucketed into <paramref name="samples" />
-/// buckets. Each of the buckets is used once and the representative is chosen
-/// randomly using a uniform integer distribution. Therefore, the samlples will
-/// not be fully evenly selected if the number of expressions is not divisible
-/// by the sample size.
+/// This function is intended for application cases where the parameters are
+/// categorical and have different numbers of expressions. The resulting matrix
+/// will hold the zero-based index of the category. Note that the distribution
+/// of the samples might suffer from rounding errors.
 /// </remarks>
 /// <typeparam name="TIterator">An iterator over a range of integral numbers.
 /// </typeparam>
@@ -446,11 +444,10 @@ random(_In_ const std::size_t samples,
 /// number of expressions per parameter.
 /// </summary>
 /// <remarks>
-/// The per-parameter expressions are bucketed into <paramref name="samples" />
-/// buckets. Each of the buckets is used once and the representative is chosen
-/// randomly using a uniform integer distribution. Therefore, the samlples will
-/// not be fully evenly selected if the number of expressions is not divisible
-/// by the sample size.
+/// This function is intended for application cases where the parameters are
+/// categorical and have different numbers of expressions. The resulting matrix
+/// will hold the zero-based index of the category. Note that the distribution
+/// of the samples might suffer from rounding errors.
 /// </remarks>
 /// <typeparam name="TSize">An integral type used to specify the number of
 /// expressions per parameter.</typeparam>
@@ -483,11 +480,10 @@ random(_In_ const std::size_t samples,
 /// number of expressions per parameter.
 /// </summary>
 /// <remarks>
-/// The per-parameter expressions are bucketed into <paramref name="samples" />
-/// buckets. Each of the buckets is used once and the representative is chosen
-/// randomly using a uniform integer distribution. Therefore, the samlples will
-/// not be fully evenly selected if the number of expressions is not divisible
-/// by the sample size.
+/// This function is intended for application cases where the parameters are
+/// categorical and have different numbers of expressions. The resulting matrix
+/// will hold the zero-based index of the category. Note that the distribution
+/// of the samples might suffer from rounding errors.
 /// </remarks>
 /// <typeparam name="TSize">An integral type used to specify the number of
 /// expressions per parameter.</typeparam>

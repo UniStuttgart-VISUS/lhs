@@ -160,50 +160,25 @@ LHS_NAMESPACE::random(_In_ const std::size_t samples,
         _In_ TDist& distribution) {
     typedef typename std::iterator_traits<TIterator>::value_type size_type;
     typedef std::make_signed_t<size_type> div_type;
-
-    const auto n = static_cast<div_type>(samples);
     const auto k = std::distance(begin, end);
 
+    matrix<float> unit(samples, k);
     matrix<std::size_t> retval(samples, k);
-    std::vector<std::size_t> indices(samples);
-    std::vector<typename TDist::result_type> values(samples);
 
-    // Implements an algorithm alike to the one proposed in
-    // https://stat.ethz.ch/pipermail/r-help/2007-January/124143.html.
-    auto it = begin;
-    for (std::size_t c = 0; c < k; ++c, ++it) {
-        assert(it != end);
-        const auto cnt = static_cast<div_type>(*it) - 1;
-        const auto div = std::div(cnt, n);
+    // Create a sample from the unit hypercube.
+    random(unit, true, rng, distribution);
 
-        // Create a random permutation of [0, samples[.
-        detail::random_order(indices, values, rng, distribution);
+    // Scale the cube to the the specified ranges.
+    std::size_t c = 0;
+    for (auto it = begin; it != end; ++it, ++c) {
+        const auto cnt = (*it != 0) ? (*it - 1) : *it;
 
-        for (std::size_t r = 0; r < n; ++r) {
-            assert(it != end);
-            auto i = indices[r];
-
-            if ((div.rem == 0) || (i > div.rem)) {
-                // The number of parameter expressions is divisible by the
-                // number of samples, or alternatively, we are not in the
-                // first 'div.rem' samples that have one additional element.
-                auto start = i * div.quot;
-                auto end = start + div.quot;
-                std::uniform_int_distribution<size_type> dist(start, end);
-                retval(r, c) = dist(rng);
-
-            } else {
-                // The number of parameter expressions is not divisible by the
-                // number of samples and we are in the first 'div.rem' cases
-                // that have an additional item.
-                auto start = i * div.quot;
-                auto end = start + div.quot + 1;
-                std::uniform_int_distribution<size_type> dist(start, end);
-                retval(r, c) = dist(rng);
-            }
+        for (std::size_t r = 0; r < samples; ++r) {
+            auto value = static_cast<float>(cnt) * unit(r, c);
+            value += 0.5f;
+            retval(r, c) = static_cast<std::size_t>(value);
         }
     }
 
     return retval;
 }
-
