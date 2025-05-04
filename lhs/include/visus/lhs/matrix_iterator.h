@@ -94,7 +94,7 @@ public:
 private:
 
     inline constexpr std::size_t step(void) const noexcept {
-        return (Order == layout_v<matrix_type>)
+        return (Consecutive == layout_v<matrix_type>)
             ? this->_matrix._consecutive
             : static_cast<std::size_t>(1);
     }
