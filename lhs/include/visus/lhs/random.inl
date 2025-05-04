@@ -111,20 +111,21 @@ LHS_NAMESPACE::random(_Inout_ matrix<TValue, Layout>& result,
  * LHS_NAMESPACE::random
  */
 template<class TIterator, class TRng, class TDist>
-std::enable_if_t<
-    std::is_floating_point_v<
-        typename std::iterator_traits<TIterator>::value_type::value_type>,
+inline std::enable_if_t<LHS_DETAIL_NAMESPACE::is_range_v<
+        typename std::iterator_traits<TIterator>::value_type>,
     LHS_NAMESPACE::matrix<
         typename std::iterator_traits<TIterator>::value_type::value_type>>
 LHS_NAMESPACE::random(_In_ const std::size_t samples,
-        _In_ const TIterator begin,
-        _In_ const TIterator end,
+        _In_ TIterator&& begin,
+        _In_ TIterator&& end,
         _In_ const bool preserve_draw,
         _In_ TRng&& rng,
         _In_ TDist&& distribution) {
     typedef typename std::iterator_traits<TIterator>::value_type range_type;
-    typedef typename range_type::value_type value_type;
-    matrix<value_type> retval(samples, std::distance(begin, end));
+    typedef typename range_type::value_type int_type;
+    typedef make_floating_point_t<int_type> float_type;
+
+    matrix<float_type> retval(samples, std::distance(begin, end));
 
     // Create random samples within [0, 1].
     random(retval,
@@ -132,17 +133,10 @@ LHS_NAMESPACE::random(_In_ const std::size_t samples,
         std::forward<TRng>(rng),
         std::forward<TDist>(distribution));
 
-    // Scale the samples to the ranges defined by the parameters like suggested
-    // in https://stat.ethz.ch/pipermail/r-help/2007-January/124143.html.
-    for (std::size_t r = 0; r < samples; ++r) {
-        std::size_t c = 0;
-
-        for (auto it = begin; it != end; ++it, ++c) {
-            retval(r, c) = it->begin() + it->distance() * retval(r, c);
-        }
-    }
-
-    return retval;
+    // Scale to the requested range.
+    return detail::scale(retval,
+        std::forward<TIterator>(begin),
+        std::forward<TIterator>(end));
 }
 
 
@@ -152,33 +146,22 @@ LHS_NAMESPACE::random(_In_ const std::size_t samples,
 template<class TIterator, class TRng, class TDist>
 std::enable_if_t<std::is_integral_v<
     typename std::iterator_traits<TIterator>::value_type>,
-    LHS_NAMESPACE::matrix<std::size_t>>
+    LHS_NAMESPACE::matrix<typename std::iterator_traits<TIterator>::value_type>>
 LHS_NAMESPACE::random(_In_ const std::size_t samples,
-        _In_ const TIterator begin,
-        _In_ const TIterator end,
+        _In_ TIterator&& begin,
+        _In_ TIterator&& end,
+        _In_ const bool preserve_draw,
         _In_ TRng& rng,
         _In_ TDist& distribution) {
-    typedef typename std::iterator_traits<TIterator>::value_type size_type;
-    typedef std::make_signed_t<size_type> div_type;
-    const auto k = std::distance(begin, end);
-
-    matrix<float> unit(samples, k);
-    matrix<std::size_t> retval(samples, k);
+    typedef typename std::iterator_traits<TIterator>::value_type int_type;
+    typedef make_floating_point_t<int_type> float_type;
 
     // Create a sample from the unit hypercube.
-    random(unit, true, rng, distribution);
+    matrix<float_type> unit(samples, std::distance(begin, end));
+    random(unit, preserve_draw, rng, distribution);
 
     // Scale the cube to the the specified ranges.
-    std::size_t c = 0;
-    for (auto it = begin; it != end; ++it, ++c) {
-        const auto cnt = (*it != 0) ? (*it - 1) : *it;
-
-        for (std::size_t r = 0; r < samples; ++r) {
-            auto value = static_cast<float>(cnt) * unit(r, c);
-            value += 0.5f;
-            retval(r, c) = static_cast<std::size_t>(value);
-        }
-    }
-
-    return retval;
+    return scale(unit,
+        std::forward<TIterator>(begin),
+        std::forward<TIterator>(end));
 }

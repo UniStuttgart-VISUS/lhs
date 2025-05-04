@@ -15,10 +15,13 @@
 #include <stdexcept>
 #include <type_traits>
 
+#include "visus/lhs/make_floating_point.h"
 #include "visus/lhs/matrix.h"
 #include "visus/lhs/is_iterable.h"
+#include "visus/lhs/is_range.h"
 #include "visus/lhs/order.h"
 #include "visus/lhs/range.h"
+#include "visus/lhs/scale.h"
 #include "visus/lhs/valid.h"
 
 
@@ -221,9 +224,15 @@ random(_In_ const std::size_t samples,
 /// Create a (uniformly distributed) stratified sample from a hypercube with
 /// the given parameter <see cref="range{TValue}" />s.
 /// </summary>
+/// <remarks>
+/// <para>This function will first create a uniformly distributed sample from
+/// a unit hypercube. Afterwards, the resulting values will be scaled to the
+/// specified parameter ranges. If the parameters are integral numbers, the
+/// results will be rounded to the nearest integer value.</para>
+/// </remarks>
 /// <typeparam name="TIterator">An iterator over the parameter
-/// <paramref name="range{TValue}" />s. The elements iterated by this
-/// type must be floating-point numbers.</typeparam>
+/// <paramref name="range{TValue}" />s. The elements iterated here determine
+/// the type of the returned sample as well.</typeparam>
 /// <typeparam name="TRng">The type of the random number generator.</typeparam>
 /// <typeparam name="TDist">The type of the distribution used to generate random
 /// numbers.</typeparam>
@@ -244,13 +253,12 @@ random(_In_ const std::size_t samples,
 /// ordering the indices randomly.</param>
 /// <returns></returns>
 template<class TIterator, class TRng, class TDist>
-std::enable_if_t<
-    std::is_floating_point_v<
-        typename std::iterator_traits<TIterator>::value_type::value_type>,
+inline std::enable_if_t<detail::is_range_v<
+        typename std::iterator_traits<TIterator>::value_type>,
     matrix<typename std::iterator_traits<TIterator>::value_type::value_type>>
 random(_In_ const std::size_t samples,
-    _In_ const TIterator begin,
-    _In_ const TIterator end,
+    _In_ TIterator&& begin,
+    _In_ TIterator&& end,
     _In_ const bool preserve_draw,
     _In_ TRng&& rng,
     _In_ TDist&& distribution);
@@ -259,7 +267,15 @@ random(_In_ const std::size_t samples,
 /// Create a uniformly distributed stratified sample from a hypercube with
 /// the given parameter <see cref="range{TValue}" />s.
 /// </summary>
-/// <typeparam name="TIterator"></typeparam>
+/// <remarks>
+/// <para>This function will first create a uniformly distributed sample from
+/// a unit hypercube. Afterwards, the resulting values will be scaled to the
+/// specified parameter ranges. If the parameters are integral numbers, the
+/// results will be rounded to the nearest integer value.</para>
+/// </remarks>
+/// <typeparam name="TIterator">An iterator over the parameter
+/// <paramref name="range{TValue}" />s. The elements iterated here determine
+/// the type of the returned sample as well.</typeparam>
 /// <typeparam name="TRng">The type of the random number generator.</typeparam>
 /// <param name="samples">The number of samples to draw (the number of rows in
 /// the resulting matrix).</param>
@@ -274,9 +290,8 @@ random(_In_ const std::size_t samples,
 /// random distribution.</param>
 /// <returns></returns>
 template<class TIterator, class TRng>
-inline std::enable_if_t<
-    std::is_floating_point_v<
-        typename std::iterator_traits<TIterator>::value_type::value_type>,
+inline std::enable_if_t<detail::is_range_v<
+        typename std::iterator_traits<TIterator>::value_type>,
     matrix<typename std::iterator_traits<TIterator>::value_type::value_type>>
 random(_In_ const std::size_t samples,
         _In_ TIterator&& begin,
@@ -285,20 +300,26 @@ random(_In_ const std::size_t samples,
         _In_ TRng&& rng) {
     typedef typename std::iterator_traits<TIterator>::value_type range_type;
     typedef typename range_type::value_type value_type;
+    typedef make_floating_point_t<value_type> float_type;
     return random(samples,
         std::forward<TIterator>(begin),
         std::forward<TIterator>(end),
         preserve_draw,
         std::forward<TRng>(rng),
-        std::uniform_real_distribution<value_type>());
+        std::uniform_real_distribution<float_type>());
 }
 
 /// <summary>
 /// Create a (uniformly distributed) stratified sample from a hypercube with
 /// the given parameter <see cref="range{TValue}" />s.
 /// </summary>
-/// <typeparam name="TValue">The type of samples to be generated, which must
-/// be a floating-point number.</typeparam>
+/// <remarks>
+/// <para>This function will first create a uniformly distributed sample from
+/// a unit hypercube. Afterwards, the resulting values will be scaled to the
+/// specified parameter ranges. If the parameters are integral numbers, the
+/// results will be rounded to the nearest integer value.</para>
+/// </remarks>
+/// <typeparam name="TValue">The type of samples to be generated.</typeparam>
 /// <typeparam name="TRng">The type of the random number generator.</typeparam>
 /// <typeparam name="TDist">The type of the distribution used to generate random
 /// numbers.</typeparam>
@@ -317,10 +338,7 @@ random(_In_ const std::size_t samples,
 /// ordering the indices randomly.</param>
 /// <returns></returns>
 template<class TValue, class TRng, class TDist>
-inline std::enable_if_t<
-    std::is_floating_point_v<TValue>,
-    matrix<typename TValue>>
-random(_In_ const std::size_t samples,
+inline matrix<TValue> random(_In_ const std::size_t samples,
         _In_ const std::initializer_list<range<TValue>>& parameters,
         _In_ const bool preserve_draw,
         _In_ TRng&& rng,
@@ -337,8 +355,13 @@ random(_In_ const std::size_t samples,
 /// Create a uniformly distributed stratified sample from a hypercube with
 /// the given parameter <see cref="range{TValue}" />s.
 /// </summary>
-/// <typeparam name="TValue">The type of samples to be generated, which must
-/// be a floating-point number.</typeparam>
+/// <remarks>
+/// <para>This function will first create a uniformly distributed sample from
+/// a unit hypercube. Afterwards, the resulting values will be scaled to the
+/// specified parameter ranges. If the parameters are integral numbers, the
+/// results will be rounded to the nearest integer value.</para>
+/// </remarks>
+/// <typeparam name="TValue">The type of samples to be generated.</typeparam>
 /// <typeparam name="TRng">The type of the random number generator.</typeparam>
 /// <param name="samples">The number of samples to draw (the number of rows in
 /// the resulting matrix).</param>
@@ -351,10 +374,7 @@ random(_In_ const std::size_t samples,
 /// <paramref name="distribution" />.</param>
 /// <returns></returns>
 template<class TValue, class TRng, class TDist>
-inline std::enable_if_t<
-    std::is_floating_point_v<TValue>,
-    matrix<typename TValue>>
-random(_In_ const std::size_t samples,
+inline matrix<TValue> random(_In_ const std::size_t samples,
         _In_ const std::initializer_list<range<TValue>>& parameters,
         _In_ const bool preserve_draw,
         _In_ TRng&& rng) {
@@ -386,6 +406,8 @@ random(_In_ const std::size_t samples,
 /// <param name="begin">The begin of the range of parameters. This range
 /// describes the number of expressions for each parameter.</param>
 /// <param name="end">The end of the range of parameters.</param>
+/// <param name="preserve_draw">Indicates whether the order of the draw should
+/// be preserved if less columns are selected.</param>
 /// <param name="rng">The random number generator used to sample the given
 /// <paramref name="distribution" />.</param>
 /// <param name="distribution">The distribution used to sample the random
@@ -396,10 +418,11 @@ random(_In_ const std::size_t samples,
 template<class TIterator, class TRng, class TDist>
 std::enable_if_t<std::is_integral_v<
     typename std::iterator_traits<TIterator>::value_type>,
-    matrix<std::size_t>>
+    matrix<typename std::iterator_traits<TIterator>::value_type>>
 random(_In_ const std::size_t samples,
-    _In_ const TIterator begin,
-    _In_ const TIterator end,
+    _In_ TIterator&& begin,
+    _In_ TIterator&& end,
+    _In_ const bool preserve_draw,
     _In_ TRng& rng,
     _In_ TDist& distribution);
 
@@ -421,20 +444,24 @@ random(_In_ const std::size_t samples,
 /// <param name="begin">The begin of the range of parameters. This range
 /// describes the number of expressions for each parameter.</param>
 /// <param name="end">The end of the range of parameters.</param>
+/// <param name="preserve_draw">Indicates whether the order of the draw should
+/// be preserved if less columns are selected.</param>
 /// <param name="rng">The random number generator used to sample a uniform
 /// distribution within [0, 1].</param>
 /// <returns></returns>
 template<class TIterator, class TRng>
 inline std::enable_if_t<std::is_integral_v<
     typename std::iterator_traits<TIterator>::value_type>,
-    matrix<std::size_t>>
+    matrix<typename std::iterator_traits<TIterator>::value_type>>
 random(_In_ const std::size_t samples,
         _In_ const TIterator begin,
         _In_ const TIterator end,
+        _In_ const bool preserve_draw,
         _In_ TRng&& rng) {
     return random(samples,
         parameters.begin(),
         parameters.end(),
+        preserve_draw,
         std::forward<TRng>(rng),
         std::uniform_real_distribution<TValue>());
 }
@@ -459,6 +486,8 @@ random(_In_ const std::size_t samples,
 /// <param name="sizes">A list of numbers describing how many expressions each
 /// parameter has. The size of this list determines the number of columns of
 /// the resulting matrix.</param>
+/// <param name="preserve_draw">Indicates whether the order of the draw should
+/// be preserved if less columns are selected.</param>
 /// <param name="rng">The random number generator used to sample the given
 /// <paramref name="distribution" />.</param>
 /// <param name="distribution">The distribution used to sample the random
@@ -467,12 +496,18 @@ random(_In_ const std::size_t samples,
 /// ordering the indices randomly.</param>
 /// <returns></returns>
 template<class TSize, class TRng, class TDist>
-inline std::enable_if_t<std::is_integral_v<TSize>, matrix<std::size_t>>
+inline std::enable_if_t<std::is_integral_v<TSize>, matrix<TSize>>
 random(_In_ const std::size_t samples,
         _In_ const std::initializer_list<TSize>& sizes,
+        _In_ const bool preserve_draw,
         _In_ TRng& rng,
         _In_ TDist& distribution) {
-    return random(samples, sizes.begin(), sizes.end(), rng, distribution);
+    return random(samples,
+        sizes.begin(),
+        sizes.end(),
+        preserve_draw,
+        rng,
+        distribution);
 }
 
 /// <summary>
@@ -495,19 +530,24 @@ random(_In_ const std::size_t samples,
 /// <param name="sizes">A list of numbers describing how many expressions each
 /// parameter has. The size of this list determines the number of columns of
 /// the resulting matrix.</param>
+/// <param name="preserve_draw">Indicates whether the order of the draw should
+/// be preserved if less columns are selected.</param>
 /// <param name="rng">The random number generator used to sample a uniform
 /// distribution within [0, 1].</param>
 /// <returns></returns>
 template<class TSize, class TRng>
-inline std::enable_if_t<std::is_integral_v<TSize>, matrix<std::size_t>>
+inline std::enable_if_t<std::is_integral_v<TSize>, matrix<TSize>>
 random(_In_ const std::size_t samples,
         _In_ const std::initializer_list<TSize>& sizes,
+        _In_ const bool preserve_draw,
         _In_ TRng& rng) {
+    typedef make_floating_point_t<TSize> float_type;
     return random(samples,
         sizes.begin(),
         sizes.end(),
+        preserve_draw,
         rng,
-        std::uniform_real_distribution<float>());
+        std::uniform_real_distribution<float_type>());
 }
 
 LHS_NAMESPACE_END

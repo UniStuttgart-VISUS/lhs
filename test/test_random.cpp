@@ -212,6 +212,7 @@ namespace test {
             const auto lhs = random(4,
                 parameter_expressions.begin(),
                 parameter_expressions.end(),
+                false,
                 std::mt19937(0),
                 std::uniform_real_distribution<float>(0.0f, 1.0f));
 
@@ -243,6 +244,7 @@ namespace test {
         TEST_METHOD(test_discrete_range_initialiser) {
             const auto lhs = random(4,
                 { 3, 42, 9 },
+                false,
                 std::mt19937(0),
                 std::uniform_real_distribution<float>(0.0f, 1.0f));
 
