@@ -231,8 +231,9 @@ random(_In_ const std::size_t samples,
 /// results will be rounded to the nearest integer value.</para>
 /// </remarks>
 /// <typeparam name="TIterator">An iterator over the parameter
-/// <paramref name="range{TValue}" />s. The elements iterated here determine
-/// the type of the returned sample as well.</typeparam>
+/// <paramref name="range{TValue}" />s. The elements, which can be
+/// floating-point or integral numbers, iterated here determine the type of the
+/// returned sample as well.</typeparam>
 /// <typeparam name="TRng">The type of the random number generator.</typeparam>
 /// <typeparam name="TDist">The type of the distribution used to generate random
 /// numbers.</typeparam>
@@ -274,8 +275,9 @@ random(_In_ const std::size_t samples,
 /// results will be rounded to the nearest integer value.</para>
 /// </remarks>
 /// <typeparam name="TIterator">An iterator over the parameter
-/// <paramref name="range{TValue}" />s. The elements iterated here determine
-/// the type of the returned sample as well.</typeparam>
+/// <paramref name="range{TValue}" />s. The elements, which can be
+/// floating-point or integral numbers, iterated here determine the type of the
+/// returned sample as well.</typeparam>
 /// <typeparam name="TRng">The type of the random number generator.</typeparam>
 /// <param name="samples">The number of samples to draw (the number of rows in
 /// the resulting matrix).</param>

@@ -20,13 +20,13 @@ LHS_DETAIL_NAMESPACE_BEGIN
 /// <see cref="range{TType}" />.
 /// </summary>
 /// <typeparam name="TType">The type to be tested.</typeparam>
-template<class TType> struct is_range : std::false_type { };
+template<class TType> struct is_range final : std::false_type { };
 
 /// <summary>
 /// Specialisation for actual ranges.
 /// </summary>
 /// <typeparam name="TType">The numeric type of the range.</typeparam>
-template<class TType> struct is_range<range<TType>> : std::true_type { };
+template<class TType> struct is_range<range<TType>> final : std::true_type { };
 
 /// <summary>
 /// Answer whether <paramref name="TType" /> is an instance of

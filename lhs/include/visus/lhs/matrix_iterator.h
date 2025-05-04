@@ -11,9 +11,10 @@
 #include <cassert>
 #include <cstdlib>
 #include <iterator>
-#include <vector>
+#include <memory>
+#include <type_traits>
 
-#include "visus/lhs/matrix_layout.h"
+#include "visus/lhs/layout.h"
 
 
 LHS_DETAIL_NAMESPACE_BEGIN
@@ -21,21 +22,87 @@ LHS_DETAIL_NAMESPACE_BEGIN
 /// <summary>
 /// An iterator for rows or columns of a matrix.
 /// </summary>
-/// <typeparam name="TValue">The type used to store a scalar.</typeparam>
-/// <typeparam name="Layout">The memory layout used by the matrix</typeparam>
-template<class TValue, matrix_layout Layout, matrix_layout Order>
-class matrix_iterator final {
+template<class TMatrix, matrix_layout Consecutive>
+class matrix_iterator final
+        : public std::iterator<std::forward_iterator_tag, TMatrix> {
 
 public:
 
+    /// <summary>
+    /// The type of the matrix to be iterated over.
+    /// </summary>
+    typedef TMatrix matrix_type;
+
+    /// <summary>
+    /// Initialises a new instance.
+    /// </summary>
+    /// <param name="matrix"></param>
+    /// <param name="position"></param>
+    inline explicit matrix_iterator(
+            _In_ matrix_type& matrix,
+            _In_ const std::size_t position = 0) noexcept
+        : _matrix(matrix), _position(position) { }
+
+    reference operator *(void) const {
+        throw "TODO";
+    }
+
+    pointer operator->() {
+        throw "TODO";
+    }
+
+    /// <summary>
+    /// Prefix increment.
+    /// </summary>
+    /// <returns>The iterator after it has been advanced.</returns>
+    matrix_iterator& operator ++(void) {
+        this->_position += this->step();
+        return *this;
+    }
+
+    /// <summary>
+    /// Postfix increment.
+    /// </summary>
+    /// <returns>The iterator before it has been advanced.</returns>
+    matrix_iterator operator ++(int) {
+        auto retval = *this;
+        this->_position += this->step();
+        return retval;
+    }
+
+    /// <summary>
+    /// Test for equality.
+    /// </summary>
+    /// <param name="rhs">The right-hand-side operand.</param>
+    /// <returns><c>true</c> if this iterator and <paramref name="rhs" />
+    /// designate the same matrix element, <c>false</c> otherwise.</returns>
+    inline bool operator ==(_In_ const matrix_iterator &rhs) const noexcept {
+        return (std::addressof(this->_matrix) == std::addressof(rhs._matrix))
+            && (this->_position == rhs._position);
+    }
+
+    /// <summary>
+    /// Test for inequality.
+    /// </summary>
+    /// <param name="rhs">The right-hand-side operand.</param>
+    /// <returns><c>true</c> if this iterator and <paramref name="rhs" /> do not
+    /// designate the same matrix element, <c>false</c> otherwise.</returns>
+    inline bool operator !=(_In_ const matrix_iterator &rhs) const noexcept {
+        return !(*this == rhs);
+    }
+
 private:
 
-    std::size_t _consecutive;
-    std::vector<value_type>& _elements;
-    std::size_t _position;
+    inline constexpr std::size_t step(void) const noexcept {
+        return (Order == layout_v<matrix_type>)
+            ? this->_matrix._consecutive
+            : static_cast<std::size_t>(1);
+    }
 
+    matrix_type& _matrix;
+    std::size_t _position;
 };
 
-LHS_DETAIL_NAMESPACE_BEGIN
+LHS_DETAIL_NAMESPACE_END
 
 #endif /* !defined(_LHS_MATRIX_ITERATOR_H) */

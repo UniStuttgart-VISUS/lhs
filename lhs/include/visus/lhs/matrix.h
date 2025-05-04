@@ -15,6 +15,7 @@
 #include <type_traits>
 #include <vector>
 
+#include "visus/lhs/matrix_iterator.h"
 #include "visus/lhs/matrix_layout.h"
 
 
@@ -31,12 +32,36 @@ class matrix final {
 public:
 
     /// <summary>
+    /// An iterator over the columns of a matrix.
+    /// </summary>
+    typedef detail::matrix_iterator<matrix, matrix_layout::row_major>
+        column_iterator;
+
+    /// <summary>
+    /// An iterator over the columns of a matrix.
+    /// </summary>
+    typedef detail::matrix_iterator<const matrix, matrix_layout::row_major>
+        const_column_iterator;
+
+    /// <summary>
     /// The return type of an accessor to a matrix element.
     /// </summary>
     typedef typename std::conditional<
         (sizeof(TValue) > sizeof(std::intptr_t)),
         TValue&,
         TValue>::type return_value_type;
+
+    /// <summary>
+    /// An iterator over the rows of a matrix.
+    /// </summary>
+    typedef detail::matrix_iterator<matrix, matrix_layout::column_major>
+        row_iterator;
+
+    /// <summary>
+    /// An iterator over the rows of a matrix.
+    /// </summary>
+    typedef detail::matrix_iterator<const matrix, matrix_layout::column_major>
+        const_row_iterator;
 
     /// <summary>
     /// The type used to store a scalar.
@@ -109,6 +134,46 @@ public:
     }
 
     /// <summary>
+    /// Gets an iterator over the columns of the matrix.
+    /// </summary>
+    /// <returns>An iterator for the first column in the matrix.</returns>
+    inline column_iterator column_begin(void) noexcept {
+        return column_iterator(*this, 0);
+    }
+
+    /// <summary>
+    /// Gets an iterator over the columns of the matrix.
+    /// </summary>
+    /// <returns>An iterator for the first column in the matrix.</returns>
+    inline const_column_iterator column_begin(void) const noexcept {
+        return const_column_iterator(*this, 0);
+    }
+
+    /// <summary>
+    /// Gets the end of columns of the matrix.
+    /// </summary>
+    /// <returns>An iterator past the last column in the matrix.</returns>
+    inline column_iterator column_end(void) noexcept {
+        return column_iterator(
+            *this,
+            (Layout == matrix_layout::row_major)
+            ? this->size()
+            : this->_consecutive);
+    }
+
+    /// <summary>
+    /// Gets the end of columns of the matrix.
+    /// </summary>
+    /// <returns>An iterator past the last column in the matrix.</returns>
+    inline const_column_iterator column_end(void) const noexcept {
+        return const_column_iterator(
+            *this,
+            (Layout == matrix_layout::row_major)
+            ? this->size()
+            : this->_consecutive);
+    }
+
+    /// <summary>
     /// Answer whether the matrix has no elements.
     /// </summary>
     /// <returns><c>true</c> if the matrix has no elements,
@@ -166,6 +231,46 @@ public:
         return (Layout == matrix_layout::row_major)
             ? this->_elements.size() / this->_consecutive
             : this->_consecutive;
+    }
+
+    /// <summary>
+    /// Gets an iterator over the rows of the matrix.
+    /// </summary>
+    /// <returns>An iterator for the first row in the matrix.</returns>
+    inline row_iterator row_begin(void) noexcept {
+        return row_iterator(*this, 0);
+    }
+
+    /// <summary>
+    /// Gets an iterator over the row of the matrix.
+    /// </summary>
+    /// <returns>An iterator for the first row in the matrix.</returns>
+    inline const_row_iterator row_begin(void) const noexcept {
+        return const_row_iterator(*this, 0);
+    }
+
+    /// <summary>
+    /// Gets the end of rows of the matrix.
+    /// </summary>
+    /// <returns>An iterator past the last row in the matrix.</returns>
+    inline row_iterator row_end(void) noexcept {
+        return row_iterator(
+            *this,
+            (Layout == matrix_layout::row_major)
+            ? this->_consecutive
+            : this->size());
+    }
+
+    /// <summary>
+    /// Gets the end of rows of the matrix.
+    /// </summary>
+    /// <returns>An iterator past the last row in the matrix.</returns>
+    inline const const_row_iterator row_end(void) const noexcept {
+        return const_row_iterator(
+            *this,
+            (Layout == matrix_layout::row_major)
+            ? this->_consecutive
+            : this->size());
     }
 
     /// <summary>
@@ -301,9 +406,11 @@ public:
         return this->_elements.end();
     }
 
-    // We are all a big family ...
+    friend column_iterator;
+    friend const_column_iterator;
     template<class, matrix_layout> friend class matrix;
-
+    friend row_iterator;
+    friend const_row_iterator;
 };
 
 LHS_NAMESPACE_END
