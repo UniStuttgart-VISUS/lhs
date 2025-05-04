@@ -22,6 +22,13 @@ LHS_DETAIL_NAMESPACE_BEGIN
 /// <summary>
 /// An iterator for rows or columns of a matrix.
 /// </summary>
+/// <typeparam name="TMatrix">The type of the matrix to be iterated over.
+/// </typeparam>
+/// <typeparam name="Consecutive">The axis the iterator should traverse. For an
+/// iterator over the columns, you want to see the rows as a consecutive range,
+/// i.e. this parameter should be <see cref="matrix_layout::row_major" />. For
+/// an iterator over the columns, use <see cref="matrix_layout::column_major" />
+/// to make the rows seem to be consecutive elements.</typeparam>
 template<class TMatrix, matrix_layout Consecutive>
 class matrix_iterator final
         : public std::iterator<std::forward_iterator_tag, TMatrix> {
