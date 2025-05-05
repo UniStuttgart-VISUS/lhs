@@ -96,7 +96,7 @@ public:
     inline matrix(_In_ const std::size_t rows = 0,
             _In_ const std::size_t columns = 0,
             _In_ value_type value = static_cast<value_type>(0))
-        : _consecutive((Layout == matrix_layout::row_major) ? columns : rows),
+        : _stride((Layout == matrix_layout::row_major) ? columns : rows),
             _elements(rows * columns, value) { }
 
     /// <summary>
@@ -127,10 +127,10 @@ public:
     /// </summary>
     /// <returns>The number of columns in the matrix.</returns>
     inline std::size_t columns(void) const noexcept {
-        assert((this->_elements.size() % this->_consecutive) == 0);
+        assert((this->_elements.size() % this->_stride) == 0);
         return (Layout == matrix_layout::row_major)
-            ? this->_consecutive
-            : this->_elements.size() / this->_consecutive;
+            ? this->_stride
+            : this->_elements.size() / this->_stride;
     }
 
     /// <summary>
@@ -158,7 +158,7 @@ public:
             *this,
             (Layout == matrix_layout::row_major)
             ? this->size()
-            : this->_consecutive);
+            : this->_stride);
     }
 
     /// <summary>
@@ -170,7 +170,7 @@ public:
             *this,
             (Layout == matrix_layout::row_major)
             ? this->size()
-            : this->_consecutive);
+            : this->_stride);
     }
 
     /// <summary>
@@ -188,6 +188,27 @@ public:
     /// <param name="value">The value to set.</param>
     inline void fill(_In_ const value_type value) noexcept {
         std::fill(this->_elements.begin(), this->_elements.end(), value);
+    }
+
+    /// <summary>
+    /// Answer the index of the given <paramref name="row" /> and
+    /// <paramref name="column" /> in the in-memory representation of the
+    /// matrix.
+    /// </summary>
+    /// <param name="row">The zero-based row to get the index of. The parameter
+    /// is not checked for validity.</param>
+    /// <param name="column">The zero-based column to get the index of. The
+    /// parameter is not checked for validity.</param>
+    /// <returns>The index of the matrix element in the in-memory representation
+    /// of the matrix.</returns>
+    inline std::size_t index(
+            _In_ const std::size_t row,
+            _In_ const std::size_t column) const noexcept {
+        assert(row < this->rows());
+        assert(column < this->columns());
+        return (Layout == matrix_layout::row_major)
+            ? (row * this->_stride + column)
+            : (column * this->_stride + row);
     }
 
     /// <summary>
@@ -210,16 +231,26 @@ public:
         _Inout_ matrix<TValue, L>& dst,
         _In_ const std::size_t row) const;
 
-
     /// <summary>
-    /// Extracts a row from the matrix.
+    /// Extracts the view of a row from the matrix.
     /// </summary>
     /// <param name="row">The zero-based index of the row to be extracted.
     /// </param>
-    /// <returns>A new matrix holding only the specified row.</returns>
-    inline matrix row(_In_ const std::size_t row) const {
-        matrix retval(1, this->columns());
-        return this->row(retval, row);
+    /// <returns>A submatrix providing access to only the specified row.
+    /// </returns>
+    inline submatrix<const matrix> row(_In_ const std::size_t row) const {
+        return submatrix<const matrix>(*this, row, 0, 1, this->columns());
+    }
+
+    /// <summary>
+    /// Extracts the view of a row from the matrix.
+    /// </summary>
+    /// <param name="row">The zero-based index of the row to be extracted.
+    /// </param>
+    /// <returns>A submatrix providing access to only the specified row.
+    /// </returns>
+    inline submatrix<matrix> row(_In_ const std::size_t row) {
+        return submatrix<matrix>(*this, row, 0, 1, this->columns());
     }
 
     /// <summary>
@@ -227,10 +258,10 @@ public:
     /// </summary>
     /// <returns>The number of rows in the matrix.</returns>
     inline std::size_t rows(void) const noexcept {
-        assert((this->_elements.size() % this->_consecutive) == 0);
+        assert((this->_elements.size() % this->_stride) == 0);
         return (Layout == matrix_layout::row_major)
-            ? this->_elements.size() / this->_consecutive
-            : this->_consecutive;
+            ? this->_elements.size() / this->_stride
+            : this->_stride;
     }
 
     /// <summary>
@@ -257,7 +288,7 @@ public:
         return row_iterator(
             *this,
             (Layout == matrix_layout::row_major)
-            ? this->_consecutive
+            ? this->_stride
             : this->size());
     }
 
@@ -269,7 +300,7 @@ public:
         return const_row_iterator(
             *this,
             (Layout == matrix_layout::row_major)
-            ? this->_consecutive
+            ? this->_stride
             : this->size());
     }
 
@@ -355,17 +386,8 @@ public:
 
 private:
 
-    inline std::size_t index(_In_ const std::size_t row,
-            _In_ const std::size_t column) const noexcept {
-        assert(row < this->rows());
-        assert(column < this->columns());
-        return (Layout == matrix_layout::row_major)
-            ? (row * this->_consecutive + column)
-            : (column * this->_consecutive + row);
-    }
-
-    std::size_t _consecutive;
     std::vector<value_type> _elements;
+    std::size_t _stride;
 
 public:
 

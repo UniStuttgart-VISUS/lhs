@@ -90,7 +90,7 @@ bool LHS_NAMESPACE::matrix<TValue, Layout>::operator ==(
         return false;
     }
 
-    if (this->_consecutive != rhs._consecutive) {
+    if (this->_stride != rhs._stride) {
         return false;
     }
 

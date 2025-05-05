@@ -14,7 +14,7 @@
 #include <memory>
 #include <type_traits>
 
-#include "visus/lhs/layout.h"
+#include "visus/lhs/submatrix.h"
 
 
 LHS_DETAIL_NAMESPACE_BEGIN
@@ -102,7 +102,7 @@ private:
 
     inline constexpr std::size_t step(void) const noexcept {
         return (Consecutive == layout_v<matrix_type>)
-            ? this->_matrix._consecutive
+            ? this->_matrix._stride
             : static_cast<std::size_t>(1);
     }
 

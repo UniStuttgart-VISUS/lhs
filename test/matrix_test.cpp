@@ -8,6 +8,7 @@
 
 #include "visus/lhs/layout.h"
 #include "visus/lhs/matrix.h"
+#include "visus/lhs/submatrix.h"
 
 using namespace Microsoft::VisualStudio::CppUnitTestFramework;
 using namespace visus::lhs;
@@ -571,6 +572,46 @@ namespace test {
                 auto cnt = 0;
                 for (auto it = m.column_begin(); it != m.column_end(); ++it, ++cnt);
                 Assert::AreEqual(3, cnt, L"# of columns", LINE_INFO());
+            }
+        }
+
+        TEST_METHOD(test_submatrix) {
+            {
+                matrix<float, matrix_layout::row_major> m(4, 4);
+
+                m(0, 0) = 0.0f;
+                m(0, 1) = 0.1f;
+                m(0, 2) = 0.2f;
+                m(0, 3) = 0.3f;
+
+                m(1, 0) = 1.0f;
+                m(1, 1) = 1.1f;
+                m(1, 2) = 1.2f;
+                m(1, 3) = 1.3f;
+
+                m(2, 0) = 2.0f;
+                m(2, 1) = 2.1f;
+                m(2, 2) = 2.2f;
+                m(2, 3) = 2.3f;
+
+                m(3, 0) = 3.0f;
+                m(3, 1) = 3.1f;
+                m(3, 2) = 3.2f;
+                m(3, 3) = 3.3f;
+
+                submatrix<decltype(m)> sm(m, 1, 1, 2, 3);
+
+                Assert::AreEqual(std::size_t(2), sm.rows(), L"rows", LINE_INFO());
+                Assert::AreEqual(std::size_t(3), sm.columns(), L"columns", LINE_INFO());
+                Assert::AreEqual(std::size_t(6), sm.size(), L"size", LINE_INFO());
+
+                Assert::AreEqual(1.1f, sm(0, 0), L"0, 0", LINE_INFO());
+                Assert::AreEqual(1.2f, sm(0, 1), L"0, 1", LINE_INFO());
+                Assert::AreEqual(1.3f, sm(0, 2), L"0, 2", LINE_INFO());
+
+                Assert::AreEqual(2.1f, sm(1, 0), L"1, 0", LINE_INFO());
+                Assert::AreEqual(2.2f, sm(1, 1), L"1, 1", LINE_INFO());
+                Assert::AreEqual(2.3f, sm(1, 2), L"1, 2", LINE_INFO());
             }
         }
     };
