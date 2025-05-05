@@ -24,6 +24,12 @@ LHS_NAMESPACE_BEGIN
 /// <summary>
 /// A minimal representation of a 2D matrix.
 /// </summary>
+/// <remarks>
+/// This type is relatively dumb and supports barely any methods. Its main
+/// purpose is providing row/column-based indexing into a flat storage structure
+/// for a 2D grid. Matrices of this type are used as input and, more
+/// importantly, output of the sampling functions.
+/// </remarks>
 /// <typeparam name="TValue">The type used to store a scalar.</typeparam>
 /// <typeparam name="Layout">The memory layout used by the matrix</typeparam>
 template<class TValue, matrix_layout Layout = matrix_layout::row_major>
@@ -191,6 +197,18 @@ public:
     }
 
     /// <summary>
+    /// Fills all positions in the matrix using a generator callback that maps a
+    /// pair of row and column to the respective value.
+    /// </summary>
+    /// <typeparam name="TGenerator">The type of the generator, which must
+    /// accept the zero-based row and column and yield a value for this matrix
+    /// element.</typeparam>
+    /// <param name="generator">The generator function that maps a row and
+    /// column to a value to be applied.</param>
+    template<class TGenerator>
+    void fill(_In_ const TGenerator& generator);
+
+    /// <summary>
     /// Answer the index of the given <paramref name="row" /> and
     /// <paramref name="column" /> in the in-memory representation of the
     /// matrix.
@@ -310,6 +328,16 @@ public:
     /// <returns>The number of elements in the matrix.</returns>
     inline std::size_t size(void) const noexcept {
         return this->_elements.size();
+    }
+
+    /// <summary>
+    /// Answer the number of consecutively stored elements. The layout of the
+    /// matrix determines whether this is the number of rows or the number of
+    /// columns.
+    /// </summary>
+    /// <returns>The number of consecutively stored elements.</returns>
+    inline std::size_t stride(void) const noexcept {
+        return this->_stride;
     }
 
     /// <summary>

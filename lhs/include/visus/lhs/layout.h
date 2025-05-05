@@ -14,6 +14,7 @@
 /* Forward declarations. */
 LHS_NAMESPACE_BEGIN
 template<class, matrix_layout> class matrix;
+template<class> class submatrix;
 LHS_NAMESPACE_END;
 
 
@@ -47,12 +48,30 @@ struct layout<const matrix<TValue, Layout>> final {
 };
 
 /// <summary>
+/// Specialisation for submatrices.
+/// </summary>
+/// <typeparam name="TMatrix">The base matrix of a submatrix.</typeparam>
+template<class TMatrix>
+struct layout<submatrix<TMatrix>> final {
+    static constexpr const matrix_layout value = layout<TMatrix>::value;
+};
+
+/// <summary>
+/// Specialisation for submatrices.
+/// </summary>
+/// <typeparam name="TMatrix">The base matrix of a submatrix.</typeparam>
+template<class TMatrix>
+struct layout<const submatrix<TMatrix>> final {
+    static constexpr const matrix_layout value = layout<TMatrix>::value;
+};
+
+/// <summary>
 /// Derives the memory layout of the given <typeparamref name="TMatrix" />
 /// type.
 /// </summary>
 /// <typeparam name="TMatrix">The matrix to determine the layout of.</typeparam>
 template<class TMatrix>
-constexpr matrix_layout layout_v = typename layout<TMatrix>::value;
+constexpr matrix_layout layout_v = layout<TMatrix>::value;
 
 LHS_DETAIL_NAMESPACE_END
 

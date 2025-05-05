@@ -148,7 +148,7 @@ public:
     /// </summary>
     /// <returns>The memory layout of the submatrix.</returns>
     inline constexpr matrix_layout layout(void) const noexcept {
-        return detail::layout_v<TMatrix>;
+        return detail::layout_v<submatrix>;
     }
 
     ///// <summary>
@@ -318,19 +318,6 @@ private:
     /// <returns></returns>
     inline std::size_t offset(void) const noexcept {
         return this->_matrix.index(this->_row, this->_column);
-    }
-
-    /// <summary>
-    /// Answer the offset of the given index in the underlying matrix.
-    /// </summary>
-    /// <param name="index"></param>
-    /// <returns></returns>
-    inline std::size_t offset(_In_ const std::size_t index) const noexcept {
-        assert(index < this->size());
-        auto retval = this->offset();
-        //return (detail::layout_v<TMatrix> == matrix_layout::row_major)
-        //    ? (row * this->_stride + column)
-        //    : (column * this->_stride + row);
     }
 
     std::size_t _column;

@@ -51,6 +51,22 @@ LHS_NAMESPACE::matrix<TValue, Layout>::column(
     return dst;
 }
 
+
+/*
+ * LHS_NAMESPACE::matrix<TValue, Layout>::fill
+ */
+template<class TValue, LHS_NAMESPACE::matrix_layout Layout>
+template<class TGenerator>
+void LHS_NAMESPACE::matrix<TValue, Layout>::fill(
+        _In_ const TGenerator& generator) {
+    for (std::size_t r = 0, R = this->rows(); r < R; ++r) {
+        for (std::size_t c = 0, C = this->rows(); c < C; ++c) {
+            this->_elements[this->index(r, c)] = generator(r, c);
+        }
+    }
+}
+
+
 /*
  * LHS_NAMESPACE::matrix<TValue, Layout>::row
  */

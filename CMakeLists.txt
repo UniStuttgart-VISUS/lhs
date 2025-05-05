@@ -12,6 +12,9 @@ include(GNUInstallDirs)
 # User-configurable options.
 cmake_dependent_option(LHS_BuildTests "Build unit tests." ON WIN32 OFF)
 
+# Global options
+set (CXX_STANDARD 14)
+
 # The library
 add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/lhs)
 

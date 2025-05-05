@@ -20,19 +20,53 @@ namespace test {
 
         TEST_METHOD(test_dimensions) {
             {
-                matrix<float> m(3, 4);
+                matrix<float, matrix_layout::row_major> m(3, 4);
                 Assert::AreEqual(static_cast<std::size_t>(3), m.rows(), L"rows", LINE_INFO());
                 Assert::AreEqual(static_cast<std::size_t>(4), m.columns(), L"columns", LINE_INFO());
                 Assert::AreEqual(static_cast<std::size_t>(12), m.size(), L"size", LINE_INFO());
                 Assert::IsFalse(m.empty(), L"empty", LINE_INFO());
+                Assert::AreEqual(m.columns(), m.stride(), L"stride", LINE_INFO());
             }
 
             {
-                matrix<float> m(4, 3);
+                matrix<float, matrix_layout::row_major> m(4, 3);
                 Assert::AreEqual(static_cast<std::size_t>(4), m.rows(), L"rows", LINE_INFO());
                 Assert::AreEqual(static_cast<std::size_t>(3), m.columns(), L"columns", LINE_INFO());
                 Assert::AreEqual(static_cast<std::size_t>(12), m.size(), L"size", LINE_INFO());
                 Assert::IsFalse(m.empty(), L"empty", LINE_INFO());
+                Assert::AreEqual(m.columns(), m.stride(), L"stride", LINE_INFO());
+            }
+
+            {
+                matrix<float, matrix_layout::column_major> m(3, 4);
+                Assert::AreEqual(static_cast<std::size_t>(3), m.rows(), L"rows", LINE_INFO());
+                Assert::AreEqual(static_cast<std::size_t>(4), m.columns(), L"columns", LINE_INFO());
+                Assert::AreEqual(static_cast<std::size_t>(12), m.size(), L"size", LINE_INFO());
+                Assert::IsFalse(m.empty(), L"empty", LINE_INFO());
+                Assert::AreEqual(m.rows(), m.stride(), L"stride", LINE_INFO());
+            }
+        }
+
+        TEST_METHOD(test_index) {
+            {
+                matrix<float, matrix_layout::row_major> m(3, 4);
+                Assert::AreEqual(std::size_t(0), m.index(0, 0), L"0, 0", LINE_INFO());
+                Assert::AreEqual(std::size_t(1), m.index(0, 1), L"0, 1", LINE_INFO());
+                Assert::AreEqual(std::size_t(4), m.index(1, 0), L"1, 0", LINE_INFO());
+            }
+
+            {
+                matrix<float, matrix_layout::row_major> m(4, 3);
+                Assert::AreEqual(std::size_t(0), m.index(0, 0), L"0, 0", LINE_INFO());
+                Assert::AreEqual(std::size_t(1), m.index(0, 1), L"0, 1", LINE_INFO());
+                Assert::AreEqual(std::size_t(3), m.index(1, 0), L"1, 0", LINE_INFO());
+            }
+
+            {
+                matrix<float, matrix_layout::column_major> m(3, 4);
+                Assert::AreEqual(std::size_t(0), m.index(0, 0), L"0, 0", LINE_INFO());
+                Assert::AreEqual(std::size_t(3), m.index(0, 1), L"0, 1", LINE_INFO());
+                Assert::AreEqual(std::size_t(1), m.index(1, 0), L"1, 0", LINE_INFO());
             }
         }
 
@@ -217,6 +251,25 @@ namespace test {
             Assert::AreEqual(42.0f, m(2, 1), L"2, 1", LINE_INFO());
             Assert::AreEqual(42.0f, m(2, 2), L"2, 2", LINE_INFO());
             Assert::AreEqual(42.0f, m(2, 3), L"2, 3", LINE_INFO());
+
+            m.fill([&m](const std::size_t r, const std::size_t c) {
+                return static_cast<float>(m.index(r, c));
+            });
+
+            Assert::AreEqual(0.0f, m[0], L"0", LINE_INFO());
+            Assert::AreEqual(1.0f, m[1], L"1", LINE_INFO());
+            Assert::AreEqual(2.0f, m[2], L"2", LINE_INFO());
+            Assert::AreEqual(3.0f, m[3], L"3", LINE_INFO());
+
+            Assert::AreEqual(4.0f, m[4], L"4", LINE_INFO());
+            Assert::AreEqual(5.0f, m[5], L"5", LINE_INFO());
+            Assert::AreEqual(6.0f, m[6], L"6", LINE_INFO());
+            Assert::AreEqual(7.0f, m[7], L"7", LINE_INFO());
+
+            Assert::AreEqual(8.0f, m[8], L"8", LINE_INFO());
+            Assert::AreEqual(9.0f, m[9], L"9", LINE_INFO());
+            Assert::AreEqual(10.0f, m[10], L"10", LINE_INFO());
+            Assert::AreEqual(11.0f, m[11], L"11", LINE_INFO());
         }
 
         TEST_METHOD(test_equality) {
@@ -427,6 +480,22 @@ namespace test {
                 typedef matrix<float, matrix_layout::column_major> type;
                 type m;
                 Assert::AreEqual(int(matrix_layout::column_major), int(m.layout()), L"get", LINE_INFO());
+                Assert::AreEqual(int(matrix_layout::column_major), int(detail::layout_v<type>), L"traits", LINE_INFO());
+            }
+            {
+                typedef matrix<float, matrix_layout::row_major> base_type;
+                typedef submatrix<base_type> type;
+                base_type m(10, 10);
+                type s(m, 0, 0, 5, 5);
+                Assert::AreEqual(int(matrix_layout::row_major), int(s.layout()), L"get", LINE_INFO());
+                Assert::AreEqual(int(matrix_layout::row_major), int(detail::layout_v<type>), L"traits", LINE_INFO());
+            }
+            {
+                typedef matrix<float, matrix_layout::column_major> base_type;
+                typedef submatrix<base_type> type;
+                base_type m(10, 10);
+                type s(m, 0, 0, 5, 5);
+                Assert::AreEqual(int(matrix_layout::column_major), int(s.layout()), L"get", LINE_INFO());
                 Assert::AreEqual(int(matrix_layout::column_major), int(detail::layout_v<type>), L"traits", LINE_INFO());
             }
         }
