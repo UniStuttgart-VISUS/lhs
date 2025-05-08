@@ -14,8 +14,11 @@
 /* Forward declarations. */
 LHS_NAMESPACE_BEGIN
 template<class, matrix_layout> class matrix;
-template<class> class submatrix;
 LHS_NAMESPACE_END;
+
+LHS_DETAIL_NAMESPACE_BEGIN
+template<class, matrix_layout> class matrix_iterator;
+LHS_DETAIL_NAMESPACE_END
 
 
 LHS_DETAIL_NAMESPACE_BEGIN
@@ -48,21 +51,13 @@ struct layout<const matrix<TValue, Layout>> final {
 };
 
 /// <summary>
-/// Specialisation for submatrices.
+/// Specialisation for matrix iterators.
 /// </summary>
-/// <typeparam name="TMatrix">The base matrix of a submatrix.</typeparam>
-template<class TMatrix>
-struct layout<submatrix<TMatrix>> final {
-    static constexpr const matrix_layout value = layout<TMatrix>::value;
-};
-
-/// <summary>
-/// Specialisation for submatrices.
-/// </summary>
-/// <typeparam name="TMatrix">The base matrix of a submatrix.</typeparam>
-template<class TMatrix>
-struct layout<const submatrix<TMatrix>> final {
-    static constexpr const matrix_layout value = layout<TMatrix>::value;
+/// <typeparam name="TValue">The type of the elements in the matrix.</typeparam>
+/// <typeparamref name="Layout">The layout of the matrix.</typeparam>
+template<class TMatrix, matrix_layout Layout>
+struct layout<matrix_iterator<TMatrix, Layout>> final {
+    static constexpr const matrix_layout value = Layout;
 };
 
 /// <summary>
@@ -72,6 +67,27 @@ struct layout<const submatrix<TMatrix>> final {
 /// <typeparam name="TMatrix">The matrix to determine the layout of.</typeparam>
 template<class TMatrix>
 constexpr matrix_layout layout_v = layout<TMatrix>::value;
+
+/// <summary>
+/// Derives the inverse matrix layout of the given
+/// <typeparamref name="Layout" />.
+/// </summary>
+/// <typeparam name="Layout">The matrix layout to invert.</typeparam>
+template<matrix_layout Layout>
+struct invert_layout final {
+    static constexpr const matrix_layout value
+        = (Layout == matrix_layout::row_major)
+        ? matrix_layout::column_major
+        : matrix_layout::row_major;
+};
+
+/// <summary>
+/// Derives the inverse matrix layout of the given
+/// <typeparamref name="Layout" />.
+/// </summary>
+/// <typeparam name="Layout">The matrix layout to invert.</typeparam>
+template<matrix_layout Layout>
+constexpr matrix_layout invert_layout_v = invert_layout<Layout>::value;
 
 LHS_DETAIL_NAMESPACE_END
 

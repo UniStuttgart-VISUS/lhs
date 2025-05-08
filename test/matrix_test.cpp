@@ -8,7 +8,6 @@
 
 #include "visus/lhs/layout.h"
 #include "visus/lhs/matrix.h"
-#include "visus/lhs/submatrix.h"
 
 using namespace Microsoft::VisualStudio::CppUnitTestFramework;
 using namespace visus::lhs;
@@ -49,6 +48,36 @@ namespace test {
 
         TEST_METHOD(test_index) {
             {
+                matrix<float, matrix_layout::row_major> m(3, 3);
+                Assert::AreEqual(std::size_t(0), m.index(0, 0), L"0, 0", LINE_INFO());
+                Assert::AreEqual(std::size_t(1), m.index(0, 1), L"0, 1", LINE_INFO());
+                Assert::AreEqual(std::size_t(2), m.index(0, 2), L"0, 1", LINE_INFO());
+
+                Assert::AreEqual(std::size_t(3), m.index(1, 0), L"1, 0", LINE_INFO());
+                Assert::AreEqual(std::size_t(4), m.index(1, 1), L"1, 1", LINE_INFO());
+                Assert::AreEqual(std::size_t(5), m.index(1, 2), L"1, 1", LINE_INFO());
+
+                Assert::AreEqual(std::size_t(6), m.index(2, 0), L"2, 0", LINE_INFO());
+                Assert::AreEqual(std::size_t(7), m.index(2, 1), L"2, 1", LINE_INFO());
+                Assert::AreEqual(std::size_t(8), m.index(2, 2), L"2, 1", LINE_INFO());
+            }
+
+            {
+                matrix<float, matrix_layout::column_major> m(3, 3);
+                Assert::AreEqual(std::size_t(0), m.index(0, 0), L"0, 0", LINE_INFO());
+                Assert::AreEqual(std::size_t(1), m.index(1, 0), L"1, 1", LINE_INFO());
+                Assert::AreEqual(std::size_t(2), m.index(2, 0), L"2, 1", LINE_INFO());
+
+                Assert::AreEqual(std::size_t(3), m.index(0, 1), L"1, 0", LINE_INFO());
+                Assert::AreEqual(std::size_t(4), m.index(1, 1), L"1, 1", LINE_INFO());
+                Assert::AreEqual(std::size_t(5), m.index(2, 1), L"2, 1", LINE_INFO());
+
+                Assert::AreEqual(std::size_t(6), m.index(0, 2), L"0, 2", LINE_INFO());
+                Assert::AreEqual(std::size_t(7), m.index(1, 2), L"1, 2", LINE_INFO());
+                Assert::AreEqual(std::size_t(8), m.index(2, 2), L"2, 2", LINE_INFO());
+            }
+
+            {
                 matrix<float, matrix_layout::row_major> m(3, 4);
                 Assert::AreEqual(std::size_t(0), m.index(0, 0), L"0, 0", LINE_INFO());
                 Assert::AreEqual(std::size_t(1), m.index(0, 1), L"0, 1", LINE_INFO());
@@ -67,6 +96,204 @@ namespace test {
                 Assert::AreEqual(std::size_t(0), m.index(0, 0), L"0, 0", LINE_INFO());
                 Assert::AreEqual(std::size_t(3), m.index(0, 1), L"0, 1", LINE_INFO());
                 Assert::AreEqual(std::size_t(1), m.index(1, 0), L"1, 0", LINE_INFO());
+            }
+        }
+
+        TEST_METHOD(test_reverse_index) {
+            {
+                matrix<float, matrix_layout::row_major> m(3, 4);
+
+                {
+                    std::size_t row = 0;
+                    std::size_t col = 0;
+                    m.index(row, col, 0);
+                    Assert::AreEqual(std::size_t(0), row, L"row 0", LINE_INFO());
+                    Assert::AreEqual(std::size_t(0), col, L"column 0", LINE_INFO());
+                }
+
+                {
+                    std::size_t row = 0;
+                    std::size_t col = 0;
+                    m.index(row, col, 1);
+                    Assert::AreEqual(std::size_t(0), row, L"row 1", LINE_INFO());
+                    Assert::AreEqual(std::size_t(1), col, L"column 1", LINE_INFO());
+                }
+
+                {
+                    std::size_t row = 0;
+                    std::size_t col = 0;
+                    m.index(row, col, 4);
+                    Assert::AreEqual(std::size_t(1), row, L"row 4", LINE_INFO());
+                    Assert::AreEqual(std::size_t(0), col, L"column 4", LINE_INFO());
+                }
+            }
+
+            {
+                matrix<float, matrix_layout::row_major> m(4, 3);
+
+                {
+                    std::size_t row = 0;
+                    std::size_t col = 0;
+                    m.index(row, col, 0);
+                    Assert::AreEqual(std::size_t(0), row, L"row 0", LINE_INFO());
+                    Assert::AreEqual(std::size_t(0), col, L"column 0", LINE_INFO());
+                }
+
+                {
+                    std::size_t row = 0;
+                    std::size_t col = 0;
+                    m.index(row, col, 1);
+                    Assert::AreEqual(std::size_t(0), row, L"row 1", LINE_INFO());
+                    Assert::AreEqual(std::size_t(1), col, L"column 1", LINE_INFO());
+                }
+
+                {
+                    std::size_t row = 0;
+                    std::size_t col = 0;
+                    m.index(row, col, 3);
+                    Assert::AreEqual(std::size_t(1), row, L"row 3", LINE_INFO());
+                    Assert::AreEqual(std::size_t(0), col, L"column 3", LINE_INFO());
+                }
+            }
+
+            {
+                matrix<float, matrix_layout::column_major> m(3, 4);
+
+                {
+                    std::size_t row = 0;
+                    std::size_t col = 0;
+                    m.index(row, col, 0);
+                    Assert::AreEqual(std::size_t(0), row, L"row 0", LINE_INFO());
+                    Assert::AreEqual(std::size_t(0), col, L"column 0", LINE_INFO());
+                }
+
+                {
+                    std::size_t row = 0;
+                    std::size_t col = 0;
+                    m.index(row, col, 1);
+                    Assert::AreEqual(std::size_t(1), row, L"row 1", LINE_INFO());
+                    Assert::AreEqual(std::size_t(0), col, L"column 1", LINE_INFO());
+                }
+
+                {
+                    std::size_t row = 0;
+                    std::size_t col = 0;
+                    m.index(row, col, 3);
+                    Assert::AreEqual(std::size_t(0), row, L"row 3", LINE_INFO());
+                    Assert::AreEqual(std::size_t(1), col, L"column 3", LINE_INFO());
+                }
+            }
+
+            {
+                matrix<float, matrix_layout::row_major> m(1, 3);
+
+                {
+                    std::size_t row = 0;
+                    std::size_t col = 0;
+                    m.index(row, col, 0);
+                    Assert::AreEqual(std::size_t(0), row, L"row 0", LINE_INFO());
+                    Assert::AreEqual(std::size_t(0), col, L"column 0", LINE_INFO());
+                }
+
+                {
+                    std::size_t row = 0;
+                    std::size_t col = 0;
+                    m.index(row, col, 1);
+                    Assert::AreEqual(std::size_t(0), row, L"row 0", LINE_INFO());
+                    Assert::AreEqual(std::size_t(1), col, L"column 1", LINE_INFO());
+                }
+
+                {
+                    std::size_t row = 0;
+                    std::size_t col = 0;
+                    m.index(row, col, 2);
+                    Assert::AreEqual(std::size_t(0), row, L"row 0", LINE_INFO());
+                    Assert::AreEqual(std::size_t(2), col, L"column 2", LINE_INFO());
+                }
+            }
+
+            {
+                matrix<float, matrix_layout::column_major> m(1, 3);
+
+                {
+                    std::size_t row = 0;
+                    std::size_t col = 0;
+                    m.index(row, col, 0);
+                    Assert::AreEqual(std::size_t(0), row, L"row 0", LINE_INFO());
+                    Assert::AreEqual(std::size_t(0), col, L"column 0", LINE_INFO());
+                }
+
+                {
+                    std::size_t row = 0;
+                    std::size_t col = 0;
+                    m.index(row, col, 1);
+                    Assert::AreEqual(std::size_t(0), row, L"row 0", LINE_INFO());
+                    Assert::AreEqual(std::size_t(1), col, L"column 1", LINE_INFO());
+                }
+
+                {
+                    std::size_t row = 0;
+                    std::size_t col = 0;
+                    m.index(row, col, 2);
+                    Assert::AreEqual(std::size_t(0), row, L"row 0", LINE_INFO());
+                    Assert::AreEqual(std::size_t(2), col, L"column 2", LINE_INFO());
+                }
+            }
+
+            {
+                matrix<float, matrix_layout::row_major> m(3, 1);
+
+                {
+                    std::size_t row = 0;
+                    std::size_t col = 0;
+                    m.index(row, col, 0);
+                    Assert::AreEqual(std::size_t(0), row, L"row 0", LINE_INFO());
+                    Assert::AreEqual(std::size_t(0), col, L"column 0", LINE_INFO());
+                }
+
+                {
+                    std::size_t row = 0;
+                    std::size_t col = 0;
+                    m.index(row, col, 1);
+                    Assert::AreEqual(std::size_t(1), row, L"row 1", LINE_INFO());
+                    Assert::AreEqual(std::size_t(0), col, L"column 0", LINE_INFO());
+                }
+
+                {
+                    std::size_t row = 0;
+                    std::size_t col = 0;
+                    m.index(row, col, 2);
+                    Assert::AreEqual(std::size_t(2), row, L"row 2", LINE_INFO());
+                    Assert::AreEqual(std::size_t(0), col, L"column 0", LINE_INFO());
+                }
+            }
+
+            {
+                matrix<float, matrix_layout::column_major> m(3, 1);
+
+                {
+                    std::size_t row = 0;
+                    std::size_t col = 0;
+                    m.index(row, col, 0);
+                    Assert::AreEqual(std::size_t(0), row, L"row 0", LINE_INFO());
+                    Assert::AreEqual(std::size_t(0), col, L"column 0", LINE_INFO());
+                }
+
+                {
+                    std::size_t row = 0;
+                    std::size_t col = 0;
+                    m.index(row, col, 1);
+                    Assert::AreEqual(std::size_t(1), row, L"row 1", LINE_INFO());
+                    Assert::AreEqual(std::size_t(0), col, L"column 0", LINE_INFO());
+                }
+
+                {
+                    std::size_t row = 0;
+                    std::size_t col = 0;
+                    m.index(row, col, 2);
+                    Assert::AreEqual(std::size_t(2), row, L"row 2", LINE_INFO());
+                    Assert::AreEqual(std::size_t(0), col, L"column 0", LINE_INFO());
+                }
             }
         }
 
@@ -476,213 +703,303 @@ namespace test {
                 Assert::AreEqual(int(matrix_layout::row_major), int(m.layout()), L"get", LINE_INFO());
                 Assert::AreEqual(int(matrix_layout::row_major), int(detail::layout_v<type>), L"traits", LINE_INFO());
             }
+
             {
                 typedef matrix<float, matrix_layout::column_major> type;
                 type m;
                 Assert::AreEqual(int(matrix_layout::column_major), int(m.layout()), L"get", LINE_INFO());
                 Assert::AreEqual(int(matrix_layout::column_major), int(detail::layout_v<type>), L"traits", LINE_INFO());
             }
-            {
-                typedef matrix<float, matrix_layout::row_major> base_type;
-                typedef submatrix<base_type> type;
-                base_type m(10, 10);
-                type s(m, 0, 0, 5, 5);
-                Assert::AreEqual(int(matrix_layout::row_major), int(s.layout()), L"get", LINE_INFO());
-                Assert::AreEqual(int(matrix_layout::row_major), int(detail::layout_v<type>), L"traits", LINE_INFO());
-            }
-            {
-                typedef matrix<float, matrix_layout::column_major> base_type;
-                typedef submatrix<base_type> type;
-                base_type m(10, 10);
-                type s(m, 0, 0, 5, 5);
-                Assert::AreEqual(int(matrix_layout::column_major), int(s.layout()), L"get", LINE_INFO());
-                Assert::AreEqual(int(matrix_layout::column_major), int(detail::layout_v<type>), L"traits", LINE_INFO());
-            }
         }
 
-        TEST_METHOD(test_row_iterator) {
-            {
-                matrix<float, matrix_layout::row_major> m(3, 4);
+        TEST_METHOD(test_cm_col_iterator) {
+            matrix<float, matrix_layout::column_major> m(3, 4, [](std::size_t r, std::size_t c) { return float(r) + 0.1f * c; });
 
-                m(0, 0) = 0.0f;
-                m(0, 1) = 0.1f;
-                m(0, 2) = 0.2f;
-                m(0, 3) = 0.3f;
+            auto it = m.begin_columns();
 
-                m(1, 0) = 1.0f;
-                m(1, 1) = 1.1f;
-                m(1, 2) = 1.2f;
-                m(1, 3) = 1.3f;
+            Assert::AreEqual(0.0f, *it++, L"0, 0", LINE_INFO());
+            Assert::AreEqual(1.0f, *it++, L"1, 0", LINE_INFO());
+            Assert::AreEqual(2.0f, *it++, L"2, 0", LINE_INFO());
 
-                m(2, 0) = 2.0f;
-                m(2, 1) = 2.1f;
-                m(2, 2) = 2.2f;
-                m(2, 3) = 2.3f;
+            Assert::AreEqual(0.1f, *it++, L"0, 1", LINE_INFO());
+            Assert::AreEqual(1.1f, *it++, L"1, 1", LINE_INFO());
+            Assert::AreEqual(2.1f, *it++, L"2, 1", LINE_INFO());
 
-                auto cnt = 0;
-                for (auto it = m.row_begin(); it != m.row_end(); ++it, ++cnt) {
-                    auto jt = it;
-                    //Assert::AreEqual(0.0f, *it, L"0", LINE_INFO());
-                    //Assert::AreEqual(1.0f, *it, L"1", LINE_INFO());
-                    //Assert::AreEqual(2.0f, *it, L"2", LINE_INFO());
-                }
-                Assert::AreEqual(4, cnt, L"# of rows", LINE_INFO());
-            }
+            Assert::AreEqual(0.2f, *it++, L"0, 2", LINE_INFO());
+            Assert::AreEqual(1.2f, *it++, L"1, 2", LINE_INFO());
+            Assert::AreEqual(2.2f, *it++, L"2, 2", LINE_INFO());
 
-            {
-                const matrix<float, matrix_layout::row_major> m(3, 4);
-                auto cnt = 0;
-                for (auto it = m.row_begin(); it != m.row_end(); ++it, ++cnt);
-                Assert::AreEqual(4, cnt, L"# of rows", LINE_INFO());
-            }
+            Assert::AreEqual(0.3f, *it++, L"0, 3", LINE_INFO());
+            Assert::AreEqual(1.3f, *it++, L"1, 3", LINE_INFO());
+            Assert::AreEqual(2.3f, *it++, L"2, 3", LINE_INFO());
 
-            {
-                matrix<float, matrix_layout::column_major> m(3, 4);
-
-                m(0, 0) = 0.0f;
-                m(0, 1) = 0.1f;
-                m(0, 2) = 0.2f;
-                m(0, 3) = 0.3f;
-
-                m(1, 0) = 1.0f;
-                m(1, 1) = 1.1f;
-                m(1, 2) = 1.2f;
-                m(1, 3) = 1.3f;
-
-                m(2, 0) = 2.0f;
-                m(2, 1) = 2.1f;
-                m(2, 2) = 2.2f;
-                m(2, 3) = 2.3f;
-
-                auto cnt = 0;
-                for (auto it = m.row_begin(); it != m.row_end(); ++it, ++cnt) {
-                    auto jt = it;
-                    //Assert::AreEqual(0.0f, *it, L"0", LINE_INFO());
-                    //Assert::AreEqual(1.0f, *it, L"1", LINE_INFO());
-                    //Assert::AreEqual(2.0f, *it, L"2", LINE_INFO());
-                }
-                Assert::AreEqual(4, cnt, L"# of rows", LINE_INFO());
-            }
-
-            {
-                const matrix<float, matrix_layout::column_major> m(3, 4);
-                auto cnt = 0;
-                for (auto it = m.row_begin(); it != m.row_end(); ++it, ++cnt);
-                Assert::AreEqual(4, cnt, L"# of rows", LINE_INFO());
-            }
+            Assert::IsTrue(it == m.end_columns(), L"end reached", LINE_INFO());
         }
 
-        TEST_METHOD(test_column_iterator) {
-            {
-                matrix<float, matrix_layout::row_major> m(3, 4);
+        TEST_METHOD(test_cm_const_col_iterator) {
+            const matrix<float, matrix_layout::column_major> m(3, 4, [](std::size_t r, std::size_t c) { return float(r) + 0.1f * c; });
 
-                m(0, 0) = 0.0f;
-                m(0, 1) = 0.1f;
-                m(0, 2) = 0.2f;
-                m(0, 3) = 0.3f;
+            auto it = m.begin_columns();
 
-                m(1, 0) = 1.0f;
-                m(1, 1) = 1.1f;
-                m(1, 2) = 1.2f;
-                m(1, 3) = 1.3f;
+            Assert::AreEqual(0.0f, *it++, L"0, 0", LINE_INFO());
+            Assert::AreEqual(1.0f, *it++, L"1, 0", LINE_INFO());
+            Assert::AreEqual(2.0f, *it++, L"2, 0", LINE_INFO());
 
-                m(2, 0) = 2.0f;
-                m(2, 1) = 2.1f;
-                m(2, 2) = 2.2f;
-                m(2, 3) = 2.3f;
+            Assert::AreEqual(0.1f, *it++, L"0, 1", LINE_INFO());
+            Assert::AreEqual(1.1f, *it++, L"1, 1", LINE_INFO());
+            Assert::AreEqual(2.1f, *it++, L"2, 1", LINE_INFO());
 
-                auto cnt = 0;
-                for (auto it = m.column_begin(); it != m.column_end(); ++it, ++cnt) {
-                    auto jt = it;
-                    //Assert::AreEqual(0.0f, *it, L"0", LINE_INFO());
-                    //Assert::AreEqual(1.0f, *it, L"1", LINE_INFO());
-                    //Assert::AreEqual(2.0f, *it, L"2", LINE_INFO());
-                }
-                Assert::AreEqual(3, cnt, L"# of columns", LINE_INFO());
-            }
+            Assert::AreEqual(0.2f, *it++, L"0, 2", LINE_INFO());
+            Assert::AreEqual(1.2f, *it++, L"1, 2", LINE_INFO());
+            Assert::AreEqual(2.2f, *it++, L"2, 2", LINE_INFO());
 
-            {
-                const matrix<float, matrix_layout::row_major> m(3, 4);
-                auto cnt = 0;
-                for (auto it = m.column_begin(); it != m.column_end(); ++it, ++cnt);
-                Assert::AreEqual(3, cnt, L"# of columns", LINE_INFO());
-            }
+            Assert::AreEqual(0.3f, *it++, L"0, 3", LINE_INFO());
+            Assert::AreEqual(1.3f, *it++, L"1, 3", LINE_INFO());
+            Assert::AreEqual(2.3f, *it++, L"2, 3", LINE_INFO());
 
-            {
-                matrix<float, matrix_layout::column_major> m(3, 4);
-
-                m(0, 0) = 0.0f;
-                m(0, 1) = 0.1f;
-                m(0, 2) = 0.2f;
-                m(0, 3) = 0.3f;
-
-                m(1, 0) = 1.0f;
-                m(1, 1) = 1.1f;
-                m(1, 2) = 1.2f;
-                m(1, 3) = 1.3f;
-
-                m(2, 0) = 2.0f;
-                m(2, 1) = 2.1f;
-                m(2, 2) = 2.2f;
-                m(2, 3) = 2.3f;
-
-                auto cnt = 0;
-                for (auto it = m.column_begin(); it != m.column_end(); ++it, ++cnt) {
-                    auto jt = it;
-                    //Assert::AreEqual(0.0f, *it, L"0", LINE_INFO());
-                    //Assert::AreEqual(1.0f, *it, L"1", LINE_INFO());
-                    //Assert::AreEqual(2.0f, *it, L"2", LINE_INFO());
-                }
-                Assert::AreEqual(3, cnt, L"# of columns", LINE_INFO());
-            }
-
-            {
-                const matrix<float, matrix_layout::column_major> m(3, 4);
-                auto cnt = 0;
-                for (auto it = m.column_begin(); it != m.column_end(); ++it, ++cnt);
-                Assert::AreEqual(3, cnt, L"# of columns", LINE_INFO());
-            }
+            Assert::IsTrue(it == m.end_columns(), L"end reached", LINE_INFO());
         }
 
-        TEST_METHOD(test_submatrix) {
-            {
-                matrix<float, matrix_layout::row_major> m(4, 4);
+        TEST_METHOD(test_rm_col_iterator) {
+            matrix<float, matrix_layout::row_major> m(3, 4, [](std::size_t r, std::size_t c) { return float(r) + 0.1f * c; });
 
-                m(0, 0) = 0.0f;
-                m(0, 1) = 0.1f;
-                m(0, 2) = 0.2f;
-                m(0, 3) = 0.3f;
+            auto it = m.begin_columns();
 
-                m(1, 0) = 1.0f;
-                m(1, 1) = 1.1f;
-                m(1, 2) = 1.2f;
-                m(1, 3) = 1.3f;
+            Assert::AreEqual(0.0f, *it++, L"0, 0", LINE_INFO());
+            Assert::AreEqual(1.0f, *it++, L"1, 0", LINE_INFO());
+            Assert::AreEqual(2.0f, *it++, L"2, 0", LINE_INFO());
 
-                m(2, 0) = 2.0f;
-                m(2, 1) = 2.1f;
-                m(2, 2) = 2.2f;
-                m(2, 3) = 2.3f;
+            Assert::AreEqual(0.1f, *it++, L"0, 1", LINE_INFO());
+            Assert::AreEqual(1.1f, *it++, L"1, 1", LINE_INFO());
+            Assert::AreEqual(2.1f, *it++, L"2, 1", LINE_INFO());
 
-                m(3, 0) = 3.0f;
-                m(3, 1) = 3.1f;
-                m(3, 2) = 3.2f;
-                m(3, 3) = 3.3f;
+            Assert::AreEqual(0.2f, *it++, L"0, 2", LINE_INFO());
+            Assert::AreEqual(1.2f, *it++, L"1, 2", LINE_INFO());
+            Assert::AreEqual(2.2f, *it++, L"2, 2", LINE_INFO());
 
-                submatrix<decltype(m)> sm(m, 1, 1, 2, 3);
+            Assert::AreEqual(0.3f, *it++, L"0, 3", LINE_INFO());
+            Assert::AreEqual(1.3f, *it++, L"1, 3", LINE_INFO());
+            Assert::AreEqual(2.3f, *it++, L"2, 3", LINE_INFO());
 
-                Assert::AreEqual(std::size_t(2), sm.rows(), L"rows", LINE_INFO());
-                Assert::AreEqual(std::size_t(3), sm.columns(), L"columns", LINE_INFO());
-                Assert::AreEqual(std::size_t(6), sm.size(), L"size", LINE_INFO());
-
-                Assert::AreEqual(1.1f, sm(0, 0), L"0, 0", LINE_INFO());
-                Assert::AreEqual(1.2f, sm(0, 1), L"0, 1", LINE_INFO());
-                Assert::AreEqual(1.3f, sm(0, 2), L"0, 2", LINE_INFO());
-
-                Assert::AreEqual(2.1f, sm(1, 0), L"1, 0", LINE_INFO());
-                Assert::AreEqual(2.2f, sm(1, 1), L"1, 1", LINE_INFO());
-                Assert::AreEqual(2.3f, sm(1, 2), L"1, 2", LINE_INFO());
-            }
+            Assert::IsTrue(it == m.end_columns(), L"end reached", LINE_INFO());
         }
+
+        TEST_METHOD(test_rm_const_col_iterator) {
+            const matrix<float, matrix_layout::row_major> m(3, 4, [](std::size_t r, std::size_t c) { return float(r) + 0.1f * c; });
+
+            auto it = m.begin_columns();
+
+            Assert::AreEqual(0.0f, *it++, L"0, 0", LINE_INFO());
+            Assert::AreEqual(1.0f, *it++, L"1, 0", LINE_INFO());
+            Assert::AreEqual(2.0f, *it++, L"2, 0", LINE_INFO());
+
+            Assert::AreEqual(0.1f, *it++, L"0, 1", LINE_INFO());
+            Assert::AreEqual(1.1f, *it++, L"1, 1", LINE_INFO());
+            Assert::AreEqual(2.1f, *it++, L"2, 1", LINE_INFO());
+
+            Assert::AreEqual(0.2f, *it++, L"0, 2", LINE_INFO());
+            Assert::AreEqual(1.2f, *it++, L"1, 2", LINE_INFO());
+            Assert::AreEqual(2.2f, *it++, L"2, 2", LINE_INFO());
+
+            Assert::AreEqual(0.3f, *it++, L"0, 3", LINE_INFO());
+            Assert::AreEqual(1.3f, *it++, L"1, 3", LINE_INFO());
+            Assert::AreEqual(2.3f, *it++, L"2, 3", LINE_INFO());
+
+            Assert::IsTrue(it == m.end_columns(), L"end reached", LINE_INFO());
+        }
+
+        TEST_METHOD(test_cm_row_iterator) {
+            matrix<float, matrix_layout::column_major> m(3, 4, [](std::size_t r, std::size_t c) { return float(r) + 0.1f * c; });
+
+            auto it = m.begin_rows();
+
+            Assert::AreEqual(0.0f, *it++, L"0, 0", LINE_INFO());
+            Assert::AreEqual(0.1f, *it++, L"0, 1", LINE_INFO());
+            Assert::AreEqual(0.2f, *it++, L"0, 2", LINE_INFO());
+            Assert::AreEqual(0.3f, *it++, L"0, 3", LINE_INFO());
+
+            Assert::AreEqual(1.0f, *it++, L"1, 0", LINE_INFO());
+            Assert::AreEqual(1.1f, *it++, L"1, 1", LINE_INFO());
+            Assert::AreEqual(1.2f, *it++, L"1, 2", LINE_INFO());
+            Assert::AreEqual(1.3f, *it++, L"1, 3", LINE_INFO());
+
+            Assert::AreEqual(2.0f, *it++, L"2, 0", LINE_INFO());
+            Assert::AreEqual(2.1f, *it++, L"2, 1", LINE_INFO());
+            Assert::AreEqual(2.2f, *it++, L"2, 2", LINE_INFO());
+            Assert::AreEqual(2.3f, *it++, L"2, 3", LINE_INFO());
+
+            Assert::IsTrue(it == m.end_rows(), L"end reached", LINE_INFO());
+        }
+
+        TEST_METHOD(test_cm_const_row_iterator) {
+            const matrix<float, matrix_layout::column_major> m(3, 4, [](std::size_t r, std::size_t c) { return float(r) + 0.1f * c; });
+
+            auto it = m.begin_rows();
+
+            Assert::AreEqual(0.0f, *it++, L"0, 0", LINE_INFO());
+            Assert::AreEqual(0.1f, *it++, L"0, 1", LINE_INFO());
+            Assert::AreEqual(0.2f, *it++, L"0, 2", LINE_INFO());
+            Assert::AreEqual(0.3f, *it++, L"0, 3", LINE_INFO());
+
+            Assert::AreEqual(1.0f, *it++, L"1, 0", LINE_INFO());
+            Assert::AreEqual(1.1f, *it++, L"1, 1", LINE_INFO());
+            Assert::AreEqual(1.2f, *it++, L"1, 2", LINE_INFO());
+            Assert::AreEqual(1.3f, *it++, L"1, 3", LINE_INFO());
+
+            Assert::AreEqual(2.0f, *it++, L"2, 0", LINE_INFO());
+            Assert::AreEqual(2.1f, *it++, L"2, 1", LINE_INFO());
+            Assert::AreEqual(2.2f, *it++, L"2, 2", LINE_INFO());
+            Assert::AreEqual(2.3f, *it++, L"2, 3", LINE_INFO());
+
+            Assert::IsTrue(it == m.end_rows(), L"end reached", LINE_INFO());
+        }
+
+        TEST_METHOD(test_rm_row_iterator) {
+            matrix<float, matrix_layout::row_major> m(3, 4, [](std::size_t r, std::size_t c) { return float(r) + 0.1f * c; });
+
+            auto it = m.begin_rows();
+
+            Assert::AreEqual(0.0f, *it++, L"0, 0", LINE_INFO());
+            Assert::AreEqual(0.1f, *it++, L"0, 1", LINE_INFO());
+            Assert::AreEqual(0.2f, *it++, L"0, 2", LINE_INFO());
+            Assert::AreEqual(0.3f, *it++, L"0, 3", LINE_INFO());
+
+            Assert::AreEqual(1.0f, *it++, L"1, 0", LINE_INFO());
+            Assert::AreEqual(1.1f, *it++, L"1, 1", LINE_INFO());
+            Assert::AreEqual(1.2f, *it++, L"1, 2", LINE_INFO());
+            Assert::AreEqual(1.3f, *it++, L"1, 3", LINE_INFO());
+
+            Assert::AreEqual(2.0f, *it++, L"2, 0", LINE_INFO());
+            Assert::AreEqual(2.1f, *it++, L"2, 1", LINE_INFO());
+            Assert::AreEqual(2.2f, *it++, L"2, 2", LINE_INFO());
+            Assert::AreEqual(2.3f, *it++, L"2, 3", LINE_INFO());
+
+            Assert::IsTrue(it == m.end_rows(), L"end reached", LINE_INFO());
+        }
+
+        TEST_METHOD(test_rm_const_row_iterator) {
+            const matrix<float, matrix_layout::row_major> m(3, 4, [](std::size_t r, std::size_t c) { return float(r) + 0.1f * c; });
+
+            auto it = m.begin_rows();
+
+            Assert::AreEqual(0.0f, *it++, L"0, 0", LINE_INFO());
+            Assert::AreEqual(0.1f, *it++, L"0, 1", LINE_INFO());
+            Assert::AreEqual(0.2f, *it++, L"0, 2", LINE_INFO());
+            Assert::AreEqual(0.3f, *it++, L"0, 3", LINE_INFO());
+
+            Assert::AreEqual(1.0f, *it++, L"1, 0", LINE_INFO());
+            Assert::AreEqual(1.1f, *it++, L"1, 1", LINE_INFO());
+            Assert::AreEqual(1.2f, *it++, L"1, 2", LINE_INFO());
+            Assert::AreEqual(1.3f, *it++, L"1, 3", LINE_INFO());
+
+            Assert::AreEqual(2.0f, *it++, L"2, 0", LINE_INFO());
+            Assert::AreEqual(2.1f, *it++, L"2, 1", LINE_INFO());
+            Assert::AreEqual(2.2f, *it++, L"2, 2", LINE_INFO());
+            Assert::AreEqual(2.3f, *it++, L"2, 3", LINE_INFO());
+
+            Assert::IsTrue(it == m.end_rows(), L"end reached", LINE_INFO());
+        }
+
+        TEST_METHOD(test_cm_single_col_iterator) {
+            matrix<float, matrix_layout::column_major> m(3, 4, [](std::size_t r, std::size_t c) { return float(r) + 0.1f * c; });
+
+            auto it = m.begin_column(1);
+
+            Assert::AreEqual(0.1f, *it++, L"0, 1", LINE_INFO());
+            Assert::AreEqual(1.1f, *it++, L"1, 1", LINE_INFO());
+            Assert::AreEqual(2.1f, *it++, L"2, 1", LINE_INFO());
+
+            Assert::IsTrue(it == m.end_column(1), L"end reached", LINE_INFO());
+        }
+
+        TEST_METHOD(test_cm_single_const_col_iterator) {
+            const matrix<float, matrix_layout::column_major> m(3, 4, [](std::size_t r, std::size_t c) { return float(r) + 0.1f * c; });
+
+            auto it = m.begin_column(1);
+
+            Assert::AreEqual(0.1f, *it++, L"0, 1", LINE_INFO());
+            Assert::AreEqual(1.1f, *it++, L"1, 1", LINE_INFO());
+            Assert::AreEqual(2.1f, *it++, L"2, 1", LINE_INFO());
+
+            Assert::IsTrue(it == m.end_column(1), L"end reached", LINE_INFO());
+        }
+
+        TEST_METHOD(test_rm_single_col_iterator) {
+            matrix<float, matrix_layout::row_major> m(3, 4, [](std::size_t r, std::size_t c) { return float(r) + 0.1f * c; });
+
+            auto it = m.begin_column(1);
+
+            Assert::AreEqual(0.1f, *it++, L"0, 1", LINE_INFO());
+            Assert::AreEqual(1.1f, *it++, L"1, 1", LINE_INFO());
+            Assert::AreEqual(2.1f, *it++, L"2, 1", LINE_INFO());
+
+            Assert::IsTrue(it == m.end_column(1), L"end reached", LINE_INFO());
+        }
+
+        TEST_METHOD(test_rm_single_const_col_iterator) {
+            matrix<float, matrix_layout::row_major> m(3, 4, [](std::size_t r, std::size_t c) { return float(r) + 0.1f * c; });
+
+            auto it = m.begin_column(2);
+
+            Assert::AreEqual(0.2f, *it++, L"0, 2", LINE_INFO());
+            Assert::AreEqual(1.2f, *it++, L"1, 2", LINE_INFO());
+            Assert::AreEqual(2.2f, *it++, L"2, 2", LINE_INFO());
+
+            Assert::IsTrue(it == m.end_column(2), L"end reached", LINE_INFO());
+        }
+
+        TEST_METHOD(test_cm_single_row_iterator) {
+            matrix<float, matrix_layout::column_major> m(3, 4, [](std::size_t r, std::size_t c) { return float(r) + 0.1f * c; });
+
+            auto it = m.begin_row(2);
+
+            Assert::AreEqual(2.0f, *it++, L"2, 0", LINE_INFO());
+            Assert::AreEqual(2.1f, *it++, L"2, 1", LINE_INFO());
+            Assert::AreEqual(2.2f, *it++, L"2, 2", LINE_INFO());
+            Assert::AreEqual(2.3f, *it++, L"2, 3", LINE_INFO());
+
+            Assert::IsTrue(it == m.end_row(2), L"end reached", LINE_INFO());
+        }
+
+        TEST_METHOD(test_cm_single_const_row_iterator) {
+            const matrix<float, matrix_layout::column_major> m(3, 4, [](std::size_t r, std::size_t c) { return float(r) + 0.1f * c; });
+
+            auto it = m.begin_row(0);
+
+            Assert::AreEqual(0.0f, *it++, L"0, 0", LINE_INFO());
+            Assert::AreEqual(0.1f, *it++, L"0, 1", LINE_INFO());
+            Assert::AreEqual(0.2f, *it++, L"0, 2", LINE_INFO());
+            Assert::AreEqual(0.3f, *it++, L"0, 3", LINE_INFO());
+
+            Assert::IsTrue(it == m.end_row(0), L"end reached", LINE_INFO());
+        }
+
+        TEST_METHOD(test_single_rm_row_iterator) {
+            matrix<float, matrix_layout::row_major> m(3, 4, [](std::size_t r, std::size_t c) { return float(r) + 0.1f * c; });
+
+            auto it = m.begin_row(1);
+
+            Assert::AreEqual(1.0f, *it++, L"1, 0", LINE_INFO());
+            Assert::AreEqual(1.1f, *it++, L"1, 1", LINE_INFO());
+            Assert::AreEqual(1.2f, *it++, L"1, 2", LINE_INFO());
+            Assert::AreEqual(1.3f, *it++, L"1, 3", LINE_INFO());
+
+            Assert::IsTrue(it == m.end_row(1), L"end reached", LINE_INFO());
+        }
+
+        TEST_METHOD(test_rm_single_const_row_iterator) {
+            const matrix<float, matrix_layout::row_major> m(3, 4, [](std::size_t r, std::size_t c) { return float(r) + 0.1f * c; });
+
+            auto it = m.begin_row(1);
+
+            Assert::AreEqual(1.0f, *it++, L"1, 0", LINE_INFO());
+            Assert::AreEqual(1.1f, *it++, L"1, 1", LINE_INFO());
+            Assert::AreEqual(1.2f, *it++, L"1, 2", LINE_INFO());
+            Assert::AreEqual(1.3f, *it++, L"1, 3", LINE_INFO());
+
+            Assert::IsTrue(it == m.end_row(1), L"end reached", LINE_INFO());
+        }
+
     };
 
 }

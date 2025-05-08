@@ -39,8 +39,8 @@ LHS_NAMESPACE::matrix<TValue, Layout>::column(
 
     if ((Layout == matrix_layout::column_major)
             && (L == matrix_layout::column_major)) {
-        std::copy(this->_elements.begin() + index(0, column),
-            this->_elements.begin() + index(0, column + 1),
+        std::copy(this->_elements.begin() + this->index(0, column),
+            this->_elements.begin() + this->index(0, column + 1),
             dst._elements.begin());
     } else {
         for (std::size_t r = 0; r < this->rows(); ++r) {
@@ -64,6 +64,29 @@ void LHS_NAMESPACE::matrix<TValue, Layout>::fill(
             this->_elements[this->index(r, c)] = generator(r, c);
         }
     }
+}
+
+
+/*
+ * LHS_NAMESPACE::matrix<TValue, Layout>::index
+ */
+template<class TValue, LHS_NAMESPACE::matrix_layout Layout>
+bool LHS_NAMESPACE::matrix<TValue, Layout>::index(
+        _Out_ std::size_t& row,
+        _Out_ std::size_t& column,
+        _In_ const std::size_t index) const noexcept {
+    const auto cols = this->columns();
+    const auto rows = this->rows();
+
+    if (this->layout() == matrix_layout::row_major) {
+        row = index / cols;
+        column = index % cols;
+    } else {
+        column = index / rows;
+        row = index % rows;
+    }
+
+    return ((row < rows) && (column < cols));
 }
 
 
