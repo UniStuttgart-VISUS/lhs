@@ -14,26 +14,22 @@
 #include <memory>
 #include <type_traits>
 
-#include "visus/lhs/submatrix.h"
+#include "visus/lhs/layout.h"
 
 
 LHS_DETAIL_NAMESPACE_BEGIN
 
 /// <summary>
-/// An iterator for rows or columns of a matrix.
+/// An iterator for the elements of a matrix.
 /// </summary>
 /// <typeparam name="TMatrix">The type of the matrix to be iterated over.
 /// </typeparam>
-/// <typeparam name="Consecutive">Determines the axis the iterator should
-/// traverse by specifying which elements consecutive in the iterated
-/// submatrices. For an iterator over the columns, you want to see the rows as
-/// a consecutive range, i.e. this parameter should be
-/// <see cref="matrix_layout::row_major" />. For an iterator over the rows, use
-/// <see cref="matrix_layout::column_major" /> to make the rows seem to be
-/// consecutive elements.</typeparam>
-template<class TMatrix, matrix_layout Consecutive>
+/// <typeparam name="Order">Determines the order in which the elements should
+/// be enumerated. If this is <see cref="matrix_layout::row_major" />, the
+/// elements are enumerated row by row.</typeparam>
+template<class TMatrix, matrix_layout Order>
 class matrix_iterator final : public std::iterator<std::forward_iterator_tag,
-        submatrix<TMatrix>> {
+        typename TMatrix::value_type> {
 
 public:
 
@@ -43,64 +39,37 @@ public:
     typedef TMatrix matrix_type;
 
     /// <summary>
-    /// Indicates whether the iterator traverses the matrix column by column.
-    /// </summary>
-    static constexpr const bool column_iterator
-        = (Consecutive == matrix_layout::row_major);
-
-    /// <summary>
-    /// Indicates whether the iterator traverses the matrix row by row.
-    /// </summary>
-    static constexpr const bool row_iterator
-        = (Consecutive == matrix_layout::column_major);
-
-    /// <summary>
     /// Initialises a new instance.
     /// </summary>
-    /// <param name="matrix"></param>
-    /// <param name="position"></param>
+    /// <param name="matrix">The matrix to be iterated.</param>
+    /// <param name="position">The zero-based initial position of the iterator.
+    /// </param>
     inline explicit matrix_iterator(
             _In_ matrix_type& matrix,
             _In_ const std::size_t position = 0) noexcept
         : _matrix(matrix), _position(position) { }
 
     /// <summary>
-    /// Gets a view of the row or column.
+    /// Gets a pointer to the current element.
     /// </summary>
-    /// <returns>The current row or column.</returns>
-    inline value_type operator *(void) const {
-        const auto coords = this->_matrix.index(this->_position);
-        const auto rows = row_iterator ? 1 : this->_matrix.rows();
-        const auto cols = column_iterator ? 1 : this->_matrix.columns();
-        return submatrix<TMatrix>(this->_matrix,
-            coords.first, coords.second,
-            rows, cols);
-    }
-
-    /// <summary>
-    /// Gets a view of the row or column.
-    /// </summary>
-    /// <returns>The current row or column.</returns>
-    inline value_type operator ->(void) const {
-        return *this;
+    /// <returns>A pointer to the current element.</returns>
+    inline pointer operator ->(void) {
+        return std::addressof(*this);
     }
 
     /// <summary>
     /// Prefix increment.
     /// </summary>
     /// <returns>The iterator after it has been advanced.</returns>
-    matrix_iterator& operator ++(void) {
-        this->_position += this->step();
-        return *this;
-    }
+    matrix_iterator& operator ++(void);
 
     /// <summary>
     /// Postfix increment.
     /// </summary>
     /// <returns>The iterator before it has been advanced.</returns>
-    matrix_iterator operator ++(int) {
+    inline matrix_iterator operator ++(int) {
         auto retval = *this;
-        this->_position += this->step();
+        ++(*this);
         return retval;
     }
 
@@ -127,16 +96,33 @@ public:
 
 private:
 
+    /// <summary>
+    /// Answer how many elements to skip to get to the next row or column.
+    /// </summary>
     inline constexpr std::size_t step(void) const noexcept {
-        return (Consecutive != layout_v<matrix_type>)
-            ? this->_matrix.stride()
-            : static_cast<std::size_t>(1);
+        return (Order == layout_v<matrix_type>)
+            ? static_cast<std::size_t>(1)
+            : this->_matrix.stride();
     }
 
     matrix_type& _matrix;
     std::size_t _position;
+
+public:
+
+    /// <summary>
+    /// Gets the current element.
+    /// </summary>
+    /// <returns>The current element.</returns>
+    inline auto operator *(void) -> decltype(this->_matrix[0]) {
+        const auto q = this->_position / this->_matrix.size();
+        const auto r = this->_position % this->_matrix.size();
+        return this->_matrix[q + r];
+    }
 };
 
 LHS_DETAIL_NAMESPACE_END
+
+#include "visus/lhs/matrix_iterator.inl"
 
 #endif /* !defined(_LHS_MATRIX_ITERATOR_H) */

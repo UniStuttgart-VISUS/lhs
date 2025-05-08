@@ -39,8 +39,8 @@ LHS_NAMESPACE::matrix<TValue, Layout>::column(
 
     if ((Layout == matrix_layout::column_major)
             && (L == matrix_layout::column_major)) {
-        std::copy(this->_elements.begin() + index(0, column),
-            this->_elements.begin() + index(0, column + 1),
+        std::copy(this->_elements.begin() + this->index(0, column),
+            this->_elements.begin() + this->index(0, column + 1),
             dst._elements.begin());
     } else {
         for (std::size_t r = 0; r < this->rows(); ++r) {
