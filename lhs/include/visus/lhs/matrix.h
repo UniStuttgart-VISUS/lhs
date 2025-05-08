@@ -13,6 +13,7 @@
 #include <cstring>
 #include <stdexcept>
 #include <type_traits>
+#include <utility>
 #include <vector>
 
 #include "visus/lhs/matrix_iterator.h"
@@ -134,7 +135,7 @@ public:
     /// <returns>The number of columns in the matrix.</returns>
     inline std::size_t columns(void) const noexcept {
         assert((this->_elements.size() % this->_stride) == 0);
-        return (Layout == matrix_layout::row_major)
+        return this->row_major()
             ? this->_stride
             : this->_elements.size() / this->_stride;
     }
@@ -160,11 +161,8 @@ public:
     /// </summary>
     /// <returns>An iterator past the last column in the matrix.</returns>
     inline column_iterator column_end(void) noexcept {
-        return column_iterator(
-            *this,
-            (Layout == matrix_layout::row_major)
-            ? this->size()
-            : this->_stride);
+        const auto pos = this->row_major() ? this->_stride : this->size();
+        return column_iterator(*this, pos);
     }
 
     /// <summary>
@@ -172,11 +170,17 @@ public:
     /// </summary>
     /// <returns>An iterator past the last column in the matrix.</returns>
     inline const_column_iterator column_end(void) const noexcept {
-        return const_column_iterator(
-            *this,
-            (Layout == matrix_layout::row_major)
-            ? this->size()
-            : this->_stride);
+        const auto pos = this->row_major() ? this->_stride : this->size();
+        return const_column_iterator(*this, pos);
+    }
+
+    /// <summary>
+    /// Answer whether the matrix is stored in column-major order.
+    /// </summary>
+    /// <returns><c>true</c> if the matrix is a column-major matrix,
+    /// <c>false</c> if it is a row-major matrix.</returns>
+    inline constexpr bool column_major(void) const noexcept {
+        return (Layout == matrix_layout::column_major);
     }
 
     /// <summary>
@@ -227,6 +231,33 @@ public:
         return (Layout == matrix_layout::row_major)
             ? (row * this->_stride + column)
             : (column * this->_stride + row);
+    }
+
+    /// <summary>
+    /// Answer the row and column of the given index.
+    /// </summary>
+    /// <param name="row">Receives the zero-based row.</param>
+    /// <param name="column">Receives the zero-based column.</param>
+    /// <param name="index">The index to be converted into row and column.
+    /// </param>
+    /// <returns><c>true</c> if the index is valid, <c>false</c> otherwise.
+    /// </returns>
+    bool index(_Out_ std::size_t& row,
+        _Out_ std::size_t& column,
+        _In_ const std::size_t index) const noexcept;
+
+    /// <summary>
+    /// Answer the row and column of the given index.
+    /// </summary>
+    /// <param name="index">The index to be converted into row and column.
+    /// </param>
+    /// <returns>The row and column represented by teh given index, regardless
+    /// of whether this index is valid or not.</returns>
+    inline std::pair<std::size_t, std::size_t> index(
+            _In_ const std::size_t index) const noexcept {
+        std::pair<std::size_t, std::size_t> retval;
+        this->index(retval.first, retval.second, index);
+        return retval;
     }
 
     /// <summary>
@@ -303,11 +334,8 @@ public:
     /// </summary>
     /// <returns>An iterator past the last row in the matrix.</returns>
     inline row_iterator row_end(void) noexcept {
-        return row_iterator(
-            *this,
-            (Layout == matrix_layout::row_major)
-            ? this->_stride
-            : this->size());
+        const auto pos = this->row_major() ? this->size() : this->_stride;
+        return row_iterator(*this, pos);
     }
 
     /// <summary>
@@ -315,11 +343,17 @@ public:
     /// </summary>
     /// <returns>An iterator past the last row in the matrix.</returns>
     inline const const_row_iterator row_end(void) const noexcept {
-        return const_row_iterator(
-            *this,
-            (Layout == matrix_layout::row_major)
-            ? this->_stride
-            : this->size());
+        const auto pos = this->row_major() ? this->size() : this->_stride;
+        return const_row_iterator(*this, pos);
+    }
+
+    /// <summary>
+    /// Answer whether the matrix is stored in row-major order.
+    /// </summary>
+    /// <returns><c>true</c> if the matrix is a row-major matrix,
+    /// <c>false</c> if it is a column-major matrix.</returns>
+    inline constexpr bool row_major(void) const noexcept {
+        return (Layout == matrix_layout::row_major);
     }
 
     /// <summary>
@@ -364,7 +398,7 @@ public:
     /// <param name="row">The zero-based row index.</param>
     /// <param name="column">The zero-based column index.</param>
     /// <returns>The element at the specified position.</returns>
-    inline const return_value_type operator()(
+    inline const return_value_type operator ()(
             _In_ const std::size_t row,
             _In_ const std::size_t column) const noexcept {
         return this->_elements[this->index(row, column)];
@@ -376,7 +410,7 @@ public:
     /// <param name="row">The zero-based row index.</param>
     /// <param name="column">The zero-based column index.</param>
     /// <returns>The element at the specified position.</returns>
-    inline value_type& operator()(
+    inline value_type& operator ()(
             _In_ const std::size_t row,
             _In_ const std::size_t column) noexcept {
         return this->_elements[this->index(row, column)];
@@ -387,7 +421,7 @@ public:
     /// </summary>
     /// <param name="index">The flattened index of the matrix element.</param>
     /// <returns>The element at the specified position.</returns>
-    inline const return_value_type operator[](
+    inline const return_value_type operator [](
             _In_ const std::size_t index) const noexcept {
         assert(index < this->size());
         return this->_elements[index];
@@ -398,7 +432,7 @@ public:
     /// </summary>
     /// <param name="index">The flattened index of the matrix element.</param>
     /// <returns>The element at the specified position.</returns>
-    inline value_type& operator[](_In_ const std::size_t index) noexcept {
+    inline value_type& operator [](_In_ const std::size_t index) noexcept {
         assert(index < this->size());
         return this->_elements[index];
     }
@@ -456,11 +490,7 @@ public:
         return this->_elements.end();
     }
 
-    friend column_iterator;
-    friend const_column_iterator;
     template<class, matrix_layout> friend class matrix;
-    friend row_iterator;
-    friend const_row_iterator;
 };
 
 LHS_NAMESPACE_END

@@ -24,14 +24,16 @@ LHS_DETAIL_NAMESPACE_BEGIN
 /// </summary>
 /// <typeparam name="TMatrix">The type of the matrix to be iterated over.
 /// </typeparam>
-/// <typeparam name="Consecutive">The axis the iterator should traverse. For an
-/// iterator over the columns, you want to see the rows as a consecutive range,
-/// i.e. this parameter should be <see cref="matrix_layout::row_major" />. For
-/// an iterator over the columns, use <see cref="matrix_layout::column_major" />
-/// to make the rows seem to be consecutive elements.</typeparam>
+/// <typeparam name="Consecutive">Determines the axis the iterator should
+/// traverse by specifying which elements consecutive in the iterated
+/// submatrices. For an iterator over the columns, you want to see the rows as
+/// a consecutive range, i.e. this parameter should be
+/// <see cref="matrix_layout::row_major" />. For an iterator over the rows, use
+/// <see cref="matrix_layout::column_major" /> to make the rows seem to be
+/// consecutive elements.</typeparam>
 template<class TMatrix, matrix_layout Consecutive>
-class matrix_iterator final
-        : public std::iterator<std::forward_iterator_tag, TMatrix> {
+class matrix_iterator final : public std::iterator<std::forward_iterator_tag,
+        submatrix<TMatrix>> {
 
 public:
 
@@ -39,6 +41,18 @@ public:
     /// The type of the matrix to be iterated over.
     /// </summary>
     typedef TMatrix matrix_type;
+
+    /// <summary>
+    /// Indicates whether the iterator traverses the matrix column by column.
+    /// </summary>
+    static constexpr const bool column_iterator
+        = (Consecutive == matrix_layout::row_major);
+
+    /// <summary>
+    /// Indicates whether the iterator traverses the matrix row by row.
+    /// </summary>
+    static constexpr const bool row_iterator
+        = (Consecutive == matrix_layout::column_major);
 
     /// <summary>
     /// Initialises a new instance.
@@ -50,12 +64,25 @@ public:
             _In_ const std::size_t position = 0) noexcept
         : _matrix(matrix), _position(position) { }
 
-    reference operator *(void) const {
-        throw "TODO";
+    /// <summary>
+    /// Gets a view of the row or column.
+    /// </summary>
+    /// <returns>The current row or column.</returns>
+    inline value_type operator *(void) const {
+        const auto coords = this->_matrix.index(this->_position);
+        const auto rows = row_iterator ? 1 : this->_matrix.rows();
+        const auto cols = column_iterator ? 1 : this->_matrix.columns();
+        return submatrix<TMatrix>(this->_matrix,
+            coords.first, coords.second,
+            rows, cols);
     }
 
-    pointer operator->() {
-        throw "TODO";
+    /// <summary>
+    /// Gets a view of the row or column.
+    /// </summary>
+    /// <returns>The current row or column.</returns>
+    inline value_type operator ->(void) const {
+        return *this;
     }
 
     /// <summary>
@@ -83,9 +110,9 @@ public:
     /// <param name="rhs">The right-hand-side operand.</param>
     /// <returns><c>true</c> if this iterator and <paramref name="rhs" />
     /// designate the same matrix element, <c>false</c> otherwise.</returns>
-    inline bool operator ==(_In_ const matrix_iterator &rhs) const noexcept {
-        return (std::addressof(this->_matrix) == std::addressof(rhs._matrix))
-            && (this->_position == rhs._position);
+    inline bool operator ==(_In_ const matrix_iterator& rhs) const noexcept {
+        assert(std::addressof(this->_matrix) == std::addressof(rhs._matrix));
+        return (this->_position == rhs._position);
     }
 
     /// <summary>
@@ -94,15 +121,15 @@ public:
     /// <param name="rhs">The right-hand-side operand.</param>
     /// <returns><c>true</c> if this iterator and <paramref name="rhs" /> do not
     /// designate the same matrix element, <c>false</c> otherwise.</returns>
-    inline bool operator !=(_In_ const matrix_iterator &rhs) const noexcept {
+    inline bool operator !=(_In_ const matrix_iterator& rhs) const noexcept {
         return !(*this == rhs);
     }
 
 private:
 
     inline constexpr std::size_t step(void) const noexcept {
-        return (Consecutive == layout_v<matrix_type>)
-            ? this->_matrix._stride
+        return (Consecutive != layout_v<matrix_type>)
+            ? this->_matrix.stride()
             : static_cast<std::size_t>(1);
     }
 

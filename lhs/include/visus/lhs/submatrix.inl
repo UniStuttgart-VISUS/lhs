@@ -6,28 +6,26 @@
 
 
 /*
- * LHS_NAMESPACE::submatrix<TMatrix>::submatrix
+ * LHS_NAMESPACE::submatrix<TMatrix>::move
  */
 template<class TMatrix>
 LHS_NAMESPACE::submatrix<TMatrix>::submatrix(
-        _In_ TMatrix& matrix,
+        _In_ TMatrix &matrix,
         _In_ const std::size_t row,
         _In_ const std::size_t column,
         _In_ const std::size_t rows,
         _In_ const std::size_t columns)
-    : _column(column),
-        _columns(columns),
-        _matrix(matrix),
-        _row(row),
-        _rows(rows) {
-    if (this->_row + this->_rows >= this->_matrix.rows()) {
-        std::range_error("The row range exceeds the number of rows of the "
-            "underlying matrix.");
-    }
-    if (this->_column + this->_columns >= this->_matrix.columns()) {
-        std::range_error("The column range exceeds the number of columns of "
+        : _columns(columns), _matrix(matrix), _rows(rows) {
+    if (row + rows > this->_matrix.rows()) {
+        throw std::range_error("The row range exceeds the number of rows of "
             "the underlying matrix.");
     }
+    if (column + columns > this->_matrix.columns()) {
+        throw std::range_error("The column range exceeds the number of columns "
+            "of the underlying matrix.");
+    }
+
+    this->_offset = this->_matrix.index(row, column);
 }
 
 
@@ -37,27 +35,53 @@ LHS_NAMESPACE::submatrix<TMatrix>::submatrix(
 template<class TMatrix>
 bool LHS_NAMESPACE::submatrix<TMatrix>::operator ==(
         _In_ const submatrix& rhs) const noexcept {
-    return (this->_column == rhs._column)
-        && (this->_columns == rhs._columns)
-        && (this->_row == rhs._row)
-        && (this->_rows == rhs._rows)
-        && (std::addressof(this->_matrix) == std::addressof(rhs._matrix));
+    return (this->_columns == rhs._columns)
+        && (std::addressof(this->_matrix) == std::addressof(rhs._matrix))
+        && (this->_offset == rhs._offset)
+        && (this->_rows == rhs._rows);
 }
 
 
 /*
- * LHS_NAMESPACE::submatrix<TMatrix>::location
+ * LHS_NAMESPACE::submatrix<TMatrix>::operator TMatrix
  */
 template<class TMatrix>
-void LHS_NAMESPACE::submatrix<TMatrix>::location(
-        _Out_ std::size_t& row,
-        _Out_ std::size_t& column,
+LHS_NAMESPACE::submatrix<TMatrix>::operator TMatrix(void) const {
+    TMatrix retval(this->rows(), this->columns());
+    retval.fill([this](const std::size_t r, const std::size_t c) {
+        return (*this)(r, c);
+    });
+    return retval;
+}
+
+
+/*
+ * LHS_NAMESPACE::submatrix<TMatrix>::index
+ */
+template<class TMatrix>
+std::size_t LHS_NAMESPACE::submatrix<TMatrix>::index(
+        _In_ const std::size_t row,
+        _In_ const std::size_t column) const noexcept {
+    assert(row < this->_rows);
+    assert(column < this->_columns);
+    const auto index = (detail::layout_v<TMatrix> == matrix_layout::row_major)
+        ? (row * this->_matrix.stride() + column)
+        : (column * this->_matrix.stride() + row);
+    return this->_offset + index;
+
+}
+
+
+/*
+ * LHS_NAMESPACE::submatrix<TMatrix>::index
+ */
+template<class TMatrix>
+std::size_t LHS_NAMESPACE::submatrix<TMatrix>::index(
         _In_ const std::size_t index) const noexcept {
-    if (detail::layout_v<TMatrix> == matrix_layout::row_major) {
-        row = index / this->_columns;
-        column = index % this->_columns;
+    assert(index < this->size());
+    if (this->layout() == matrix_layout::row_major) {
+        return this->index(index / this->_columns, index % this->_columns);
     } else {
-        column = index / this->_rows;
-        row = index % this->_rows;
+        return this->index(index % this->_rows, index / this->_rows);
     }
 }

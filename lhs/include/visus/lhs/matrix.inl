@@ -68,6 +68,29 @@ void LHS_NAMESPACE::matrix<TValue, Layout>::fill(
 
 
 /*
+ * LHS_NAMESPACE::matrix<TValue, Layout>::index
+ */
+template<class TValue, LHS_NAMESPACE::matrix_layout Layout>
+bool LHS_NAMESPACE::matrix<TValue, Layout>::index(
+        _Out_ std::size_t& row,
+        _Out_ std::size_t& column,
+        _In_ const std::size_t index) const noexcept {
+    const auto cols = this->columns();
+    const auto rows = this->rows();
+
+    if (this->layout() == matrix_layout::row_major) {
+        row = index / cols;
+        column = index % cols;
+    } else {
+        column = index / rows;
+        row = index % rows;
+    }
+
+    return ((row < rows) && (column < cols));
+}
+
+
+/*
  * LHS_NAMESPACE::matrix<TValue, Layout>::row
  */
 template<class TValue, LHS_NAMESPACE::matrix_layout Layout>

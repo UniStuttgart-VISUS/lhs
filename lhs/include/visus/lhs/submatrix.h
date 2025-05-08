@@ -41,11 +41,11 @@ public:
     /// <summary>
     /// Initialises a new instance.
     /// </summary>
-    /// <param name="matrix"></param>
-    /// <param name="row"></param>
-    /// <param name="column"></param>
-    /// <param name="rows"></param>
-    /// <param name="columns"></param>
+    /// <param name="matrix">The matrix to create a sub-view of.</param>
+    /// <param name="row">The zero-based index of the first row.</param>
+    /// <param name="column">The zero-based index of the first column.</param>
+    /// <param name="rows">The number of rows in the submatrix.</param>
+    /// <param name="columns">The number of columns in the submatrix.</param>
     /// <exception cref="std::range_error">The specified subrange exceeds the
     /// bounds of the given <paramref name="matrix" />.</exception>
     submatrix(_In_ TMatrix& matrix,
@@ -54,28 +54,21 @@ public:
         _In_ const std::size_t rows,
         _In_ const std::size_t columns);
 
-    ///// <summary>
-    ///// Extracts a column from the submatrix.
-    ///// </summary>
-    ///// <typeparam name="L">The layout of <paramref name="dst" />.</typeparam>
-    ///// <param name="dst">The submatrix to receive the single column.</param>
-    ///// <param name="column">The zero-based index of the column to be extracted.
-    ///// </param>
-    ///// <returns><paramref name="dst" />.</returns>
-    //template<submatrix_layout L> submatrix<TValue, L>& column(
-    //    _Inout_ submatrix<TValue, L>& dst,
-    //    _In_ const std::size_t column) const;
+    /// <summary>
+    /// Answer the underlying matrix.
+    /// </summary>
+    /// <returns>A reference to the underlying matix.</returns>
+    inline TMatrix& base(void) noexcept {
+        return this->_matrix;
+    }
 
-    ///// <summary>
-    ///// Extracts a column from the submatrix.
-    ///// </summary>
-    ///// <param name="column">The zero-based index of the column to be extracted.
-    ///// </param>
-    ///// <returns>A new submatrix holding only the specified column.</returns>
-    //inline submatrix column(_In_ const std::size_t column) const {
-    //    submatrix retval(this->rows(), 1);
-    //    return this->column(retval, column);
-    //}
+    /// <summary>
+    /// Answer the underlying matrix.
+    /// </summary>
+    /// <returns>A reference to the underlying matix.</returns>
+    inline const TMatrix& base(void) const noexcept {
+        return this->_matrix;
+    }
 
     /// <summary>
     /// Answer the number of columns in the submatrix.
@@ -84,46 +77,6 @@ public:
     inline std::size_t columns(void) const noexcept {
         return this->_columns;
     }
-
-    ///// <summary>
-    ///// Gets an iterator over the columns of the submatrix.
-    ///// </summary>
-    ///// <returns>An iterator for the first column in the submatrix.</returns>
-    //inline column_iterator column_begin(void) noexcept {
-    //    return column_iterator(*this, 0);
-    //}
-
-    ///// <summary>
-    ///// Gets an iterator over the columns of the submatrix.
-    ///// </summary>
-    ///// <returns>An iterator for the first column in the submatrix.</returns>
-    //inline const_column_iterator column_begin(void) const noexcept {
-    //    return const_column_iterator(*this, 0);
-    //}
-
-    ///// <summary>
-    ///// Gets the end of columns of the submatrix.
-    ///// </summary>
-    ///// <returns>An iterator past the last column in the submatrix.</returns>
-    //inline column_iterator column_end(void) noexcept {
-    //    return column_iterator(
-    //        *this,
-    //        (Layout == submatrix_layout::row_major)
-    //        ? this->size()
-    //        : this->_consecutive);
-    //}
-
-    ///// <summary>
-    ///// Gets the end of columns of the submatrix.
-    ///// </summary>
-    ///// <returns>An iterator past the last column in the submatrix.</returns>
-    //inline const_column_iterator column_end(void) const noexcept {
-    //    return const_column_iterator(
-    //        *this,
-    //        (Layout == submatrix_layout::row_major)
-    //        ? this->size()
-    //        : this->_consecutive);
-    //}
 
     /// <summary>
     /// Answer whether the submatrix has no elements.
@@ -151,29 +104,6 @@ public:
         return detail::layout_v<submatrix>;
     }
 
-    ///// <summary>
-    ///// Extracts a row from the submatrix.
-    ///// </summary>
-    ///// <typeparam name="L">The layout of <paramref name="dst" />.</typeparam>
-    ///// <param name="dst">The submatrix to receive the single row.</param>
-    ///// <param name="row">The zero-based index of the row to be extracted.
-    ///// </param>
-    ///// <returns><paramref name="dst" />.</returns>
-    //template<submatrix_layout L> submatrix<TValue, L>& row(
-    //    _Inout_ submatrix<TValue, L>& dst,
-    //    _In_ const std::size_t row) const;
-
-    ///// <summary>
-    ///// Extracts a row from the submatrix.
-    ///// </summary>
-    ///// <param name="row">The zero-based index of the row to be extracted.
-    ///// </param>
-    ///// <returns>A new submatrix holding only the specified row.</returns>
-    //inline submatrix row(_In_ const std::size_t row) const {
-    //    submatrix retval(1, this->columns());
-    //    return this->row(retval, row);
-    //}
-
     /// <summary>
     /// Answer the number of rows in the submatrix.
     /// </summary>
@@ -181,46 +111,6 @@ public:
     inline std::size_t rows(void) const noexcept {
         return this->_rows;
     }
-
-    ///// <summary>
-    ///// Gets an iterator over the rows of the submatrix.
-    ///// </summary>
-    ///// <returns>An iterator for the first row in the submatrix.</returns>
-    //inline row_iterator row_begin(void) noexcept {
-    //    return row_iterator(*this, 0);
-    //}
-
-    ///// <summary>
-    ///// Gets an iterator over the row of the submatrix.
-    ///// </summary>
-    ///// <returns>An iterator for the first row in the submatrix.</returns>
-    //inline const_row_iterator row_begin(void) const noexcept {
-    //    return const_row_iterator(*this, 0);
-    //}
-
-    ///// <summary>
-    ///// Gets the end of rows of the submatrix.
-    ///// </summary>
-    ///// <returns>An iterator past the last row in the submatrix.</returns>
-    //inline row_iterator row_end(void) noexcept {
-    //    return row_iterator(
-    //        *this,
-    //        (Layout == submatrix_layout::row_major)
-    //        ? this->_consecutive
-    //        : this->size());
-    //}
-
-    ///// <summary>
-    ///// Gets the end of rows of the submatrix.
-    ///// </summary>
-    ///// <returns>An iterator past the last row in the submatrix.</returns>
-    //inline const const_row_iterator row_end(void) const noexcept {
-    //    return const_row_iterator(
-    //        *this,
-    //        (Layout == submatrix_layout::row_major)
-    //        ? this->_consecutive
-    //        : this->size());
-    //}
 
     /// <summary>
     /// Answer the number of elements in the submatrix.
@@ -259,7 +149,7 @@ public:
             _In_ const std::size_t column) const noexcept {
         assert(row < this->_rows);
         assert(column < this->_columns);
-        return this->_matrix(row + this->_row, column + this->_column);
+        return this->_matrix[this->index(row, column)];
     }
 
     /// <summary>
@@ -273,7 +163,7 @@ public:
             _In_ const std::size_t column) noexcept {
         assert(row < this->_rows);
         assert(column < this->_columns);
-        return this->_matrix(row + this->_row, column + this->_column);
+        return this->_matrix[this->index(row, column)];
     }
 
     /// <summary>
@@ -284,9 +174,7 @@ public:
     inline const return_value_type operator[](
             _In_ const std::size_t index) const noexcept {
         assert(index < this->size());
-        std::size_t r, c;
-        this->location(r, c, index);
-        return (*this)(r, c);
+        return this->_matrix[this->index(index)];
     }
 
     /// <summary>
@@ -296,34 +184,32 @@ public:
     /// <returns>The element at the specified position.</returns>
     inline value_type& operator[](_In_ const std::size_t index) noexcept {
         assert(index < this->size());
-        std::size_t r, c;
-        this->location(r, c, index);
-        return (*this)(r, c);
+        return this->_matrix[this->index(index)];
     }
+
+    /// <summary>
+    /// Realise the submatrix as an actual <see cref="matrix{TValue, Layout}" />.
+    /// </summary>
+    /// <returns>The submatrix as a new matrix.</returns>
+    operator TMatrix(void) const;
 
 private:
 
     /// <summary>
-    /// Answer the row and column of the given index local to the submatrix.
+    /// Answer the submatrix row and column in the base matrix.
     /// </summary>
-    /// <param name="row"></param>
-    /// <param name="column"></param>
-    /// <param name="index"></param>
-    void location(_Out_ std::size_t& row, _Out_ std::size_t& column,
-        _In_ const std::size_t index) const noexcept;
+    std::size_t index(_In_ const std::size_t row,
+        _In_ const std::size_t column) const noexcept;
 
     /// <summary>
-    /// Answer the offset of the submatrix in the underlying matrix.
+    /// Translate an index relative to the submatrix to an index in the
+    /// base matrix.
     /// </summary>
-    /// <returns></returns>
-    inline std::size_t offset(void) const noexcept {
-        return this->_matrix.index(this->_row, this->_column);
-    }
+    std::size_t index(_In_ const std::size_t index) const noexcept;
 
-    std::size_t _column;
     std::size_t _columns;
     TMatrix& _matrix;
-    std::size_t _row;
+    std::size_t _offset;
     std::size_t _rows;
 
 };
