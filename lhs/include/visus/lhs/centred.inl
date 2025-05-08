@@ -48,63 +48,47 @@ LHS_NAMESPACE::centred(_Inout_ matrix<TValue, Layout>& result,
     return result;
 }
 
-#if false
 /*
  * LHS_NAMESPACE::centred
  */
 template<class TIterator, class TRng, class TDist>
 inline std::enable_if_t<LHS_DETAIL_NAMESPACE::is_range_v<
-        typename std::iterator_traits<TIterator>::value_type>,
+        typename std::iterator_traits<TIterator>::value_type>
+    && std::is_floating_point_v<
+        typename std::iterator_traits<TIterator>::value_type::value_type>,
     LHS_NAMESPACE::matrix<
         typename std::iterator_traits<TIterator>::value_type::value_type>>
 LHS_NAMESPACE::centred(_In_ const std::size_t samples,
-        _In_ TIterator&& begin,
-        _In_ TIterator&& end,
-        _In_ const bool preserve_draw,
-        _In_ TRng&& rng,
-        _In_ TDist&& distribution) {
-    typedef typename std::iterator_traits<TIterator>::value_type range_type;
-    typedef typename range_type::value_type int_type;
-    typedef make_floating_point_t<int_type> float_type;
-
-    matrix<float_type> retval(samples, std::distance(begin, end));
-
-    // Create centred samples within [0, 1].
-    centred(retval,
-        preserve_draw,
-        std::forward<TRng>(rng),
-        std::forward<TDist>(distribution));
-
-    // Scale to the requested range.
-    return detail::scale(retval,
-        std::forward<TIterator>(begin),
-        std::forward<TIterator>(end));
-}
-
-
-/*
- * LHS_NAMESPACE::centred
- */
-template<class TIterator, class TRng, class TDist>
-std::enable_if_t<std::is_integral_v<
-    typename std::iterator_traits<TIterator>::value_type>,
-    LHS_NAMESPACE::matrix<typename std::iterator_traits<TIterator>::value_type>>
-LHS_NAMESPACE::centred(_In_ const std::size_t samples,
-        _In_ TIterator&& begin,
-        _In_ TIterator&& end,
-        _In_ const bool preserve_draw,
+        _In_ const TIterator& begin,
+        _In_ const TIterator& end,
         _In_ TRng& rng,
         _In_ TDist& distribution) {
-    typedef typename std::iterator_traits<TIterator>::value_type int_type;
-    typedef make_floating_point_t<int_type> float_type;
+    typedef typename std::iterator_traits<TIterator>::value_type range_type;
+    typedef typename range_type::value_type value_type;
 
-    // Create a sample from the unit hypercube.
-    matrix<float_type> unit(samples, std::distance(begin, end));
-    centred(unit, preserve_draw, rng, distribution);
+    constexpr auto half = static_cast<value_type>(0.5);
+    const auto k = std::distance(begin, end);
+    std::vector<std::size_t> indices(samples);
+    matrix<value_type> retval(samples, k);
+    std::vector<value_type> values(samples);
 
-    // Scale the cube to the the specified ranges.
-    return scale(unit,
-        std::forward<TIterator>(begin),
-        std::forward<TIterator>(end));
+    std::size_t c = 0;
+    for (auto it = begin; it != end; ++it, ++c) {
+        for (std::size_t r = 0; r < samples; ++r) {
+            values[r] = static_cast<value_type>(distribution(rng));
+        }
+
+        detail::order(indices, values.begin(), values.end());
+
+        auto step = it->distance() / static_cast<value_type>(samples);
+        for (std::size_t i = 0; i < samples; ++i) {
+            values[i] = (i + half) * step + it->begin();
+        }
+
+        for (std::size_t r = 0; r < samples; ++r) {
+            retval(r, c) = values[indices[r]];
+        }
+    }
+
+    return retval;
 }
-#endif

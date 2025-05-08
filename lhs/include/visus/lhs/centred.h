@@ -114,10 +114,10 @@ centred(_In_ const std::size_t samples,
         std::uniform_real_distribution<TValue>());
 }
 
-#if false
+
 /// <summary>
-/// Create a (uniformly distributed) stratified sample from a hypercube with
-/// the given parameter <see cref="range{TValue}" />s.
+/// Create a (uniformly distributed and centred) stratified sample from a
+/// hypercube with the given parameter <see cref="range{TValue}" />s.
 /// </summary>
 /// <remarks>
 /// <para>This function will first create a uniformly distributed sample from
@@ -139,8 +139,6 @@ centred(_In_ const std::size_t samples,
 /// <param name="end">The end of the range of parameter ranges. The distance
 /// between <paramref name="begin" /> and <paramref name="end" /> is the number
 /// of parameters (or number of columns in the matrix).</param>
-/// <param name="preserve_draw">Indicates whether the order of the draw should
-/// be preserved if less columns are selected.</param>
 /// <param name="rng">The centred number generator used to sample the given
 /// <paramref name="distribution" />.</param>
 /// <param name="distribution">The distribution used to sample the centred
@@ -150,18 +148,19 @@ centred(_In_ const std::size_t samples,
 /// <returns></returns>
 template<class TIterator, class TRng, class TDist>
 inline std::enable_if_t<detail::is_range_v<
-        typename std::iterator_traits<TIterator>::value_type>,
+            typename std::iterator_traits<TIterator>::value_type>
+        && std::is_floating_point_v<
+            typename std::iterator_traits<TIterator>::value_type::value_type>,
     matrix<typename std::iterator_traits<TIterator>::value_type::value_type>>
 centred(_In_ const std::size_t samples,
-    _In_ TIterator&& begin,
-    _In_ TIterator&& end,
-    _In_ const bool preserve_draw,
-    _In_ TRng&& rng,
-    _In_ TDist&& distribution);
+    _In_ const TIterator& begin,
+    _In_ const TIterator& end,
+    _In_ TRng& rng,
+    _In_ TDist& distribution);
 
 /// <summary>
-/// Create a uniformly distributed stratified sample from a hypercube with
-/// the given parameter <see cref="range{TValue}" />s.
+/// Create a (uniformly distributed and centred) stratified sample from a
+/// hypercube with the given parameter <see cref="range{TValue}" />s.
 /// </summary>
 /// <remarks>
 /// <para>This function will first create a uniformly distributed sample from
@@ -181,8 +180,6 @@ centred(_In_ const std::size_t samples,
 /// <param name="end">The end of the range of parameter ranges. The distance
 /// between <paramref name="begin" /> and <paramref name="end" /> is the number
 /// of parameters (or number of columns in the matrix).</param>
-/// <param name="preserve_draw">Indicates whether the order of the draw should
-/// be preserved if less columns are selected.</param>
 /// <param name="rng">The centred number generator used to sample the given
 /// centred distribution.</param>
 /// <returns></returns>
@@ -193,7 +190,6 @@ inline std::enable_if_t<detail::is_range_v<
 centred(_In_ const std::size_t samples,
         _In_ TIterator&& begin,
         _In_ TIterator&& end,
-        _In_ const bool preserve_draw,
         _In_ TRng&& rng) {
     typedef typename std::iterator_traits<TIterator>::value_type range_type;
     typedef typename range_type::value_type value_type;
@@ -201,14 +197,13 @@ centred(_In_ const std::size_t samples,
     return centred(samples,
         std::forward<TIterator>(begin),
         std::forward<TIterator>(end),
-        preserve_draw,
         std::forward<TRng>(rng),
         std::uniform_real_distribution<float_type>());
 }
 
 /// <summary>
-/// Create a (uniformly distributed) stratified sample from a hypercube with
-/// the given parameter <see cref="range{TValue}" />s.
+/// Create a (uniformly distributed and centred) stratified sample from a
+/// hypercube with the given parameter <see cref="range{TValue}" />s.
 /// </summary>
 /// <remarks>
 /// <para>This function will first create a uniformly distributed sample from
@@ -225,8 +220,6 @@ centred(_In_ const std::size_t samples,
 /// <param name="parameters">The ranges for all parameters to which the output
 /// values are scaled. The number of initialises is equal to the number of
 /// parameters or number of columns of the resulting matrix.</param>
-/// <param name="preserve_draw">Indicates whether the order of the draw should
-/// be preserved if less columns are selected.</param>
 /// <param name="rng">The centred number generator used to sample the given
 /// <paramref name="distribution" />.</param>
 /// <param name="distribution">The distribution used to sample the centred
@@ -237,20 +230,18 @@ centred(_In_ const std::size_t samples,
 template<class TValue, class TRng, class TDist>
 inline matrix<TValue> centred(_In_ const std::size_t samples,
         _In_ const std::initializer_list<range<TValue>>& parameters,
-        _In_ const bool preserve_draw,
         _In_ TRng&& rng,
         _In_ TDist&& distribution) {
     return centred(samples,
         parameters.begin(),
         parameters.end(),
-        preserve_draw,
         std::forward<TRng>(rng),
         std::forward<TDist>(distribution));
 }
 
 /// <summary>
-/// Create a uniformly distributed stratified sample from a hypercube with
-/// the given parameter <see cref="range{TValue}" />s.
+/// Create a (uniformly distributed and centred) stratified sample from a
+/// hypercube with the given parameter <see cref="range{TValue}" />s.
 /// </summary>
 /// <remarks>
 /// <para>This function will first create a uniformly distributed sample from
@@ -265,24 +256,20 @@ inline matrix<TValue> centred(_In_ const std::size_t samples,
 /// <param name="parameters">The ranges for all parameters to which the output
 /// values are scaled. The number of initialises is equal to the number of
 /// parameters or number of columns of the resulting matrix.</param>
-/// <param name="preserve_draw">Indicates whether the order of the draw should
-/// be preserved if less columns are selected.</param>
 /// <param name="rng">The centred number generator used to sample the given
 /// <paramref name="distribution" />.</param>
 /// <returns></returns>
 template<class TValue, class TRng, class TDist>
 inline matrix<TValue> centred(_In_ const std::size_t samples,
         _In_ const std::initializer_list<range<TValue>>& parameters,
-        _In_ const bool preserve_draw,
         _In_ TRng&& rng) {
     return centred(samples,
         parameters.begin(),
         parameters.end(),
-        preserve_draw,
         std::forward<TRng>(rng),
         std::uniform_real_distribution<TValue>());
 }
-#endif
+
 
 LHS_NAMESPACE_END
 
