@@ -6,9 +6,11 @@
 
 #include <CppUnitTest.h>
 
+#include "visus/lhs/matrix.h"
 #include "visus/lhs/square_distance.h"
 
 using namespace Microsoft::VisualStudio::CppUnitTestFramework;
+using namespace visus::lhs;
 using namespace visus::lhs::detail;
 
 
@@ -94,6 +96,26 @@ namespace test {
                 std::vector<float> lhs = { 2.0f, 0.0f };
                 std::vector<float> rhs = { 1.0f, 1.0f };
                 Assert::AreEqual(2.0f, square_distance(lhs.begin(), lhs.end(), rhs.begin()), L"2, 0; 1, 1", LINE_INFO());
+            }
+        }
+
+        TEST_METHOD(test_matrix_square_distance) {
+            {
+                matrix<float> lhs(3, 3, 0.0f);
+                matrix<float> rhs(3, 3, 0.0f);
+                Assert::AreEqual(0.0f, square_distance(lhs.begin_row(0), lhs.end_row(0), rhs.begin_row(0)), L"0, 0, 0; 0, 0, 0", LINE_INFO());
+            }
+
+            {
+                matrix<float> lhs(3, 3, 0.0f);
+                matrix<float> rhs(3, 3, 1.0f);
+                Assert::AreEqual(3.0f, square_distance(lhs.begin_row(1), lhs.end_row(1), rhs.begin_row(1)), L"0, 0, 0; 1, 1, 1", LINE_INFO());
+            }
+
+            {
+                matrix<float> lhs(3, 3, 0.0f);
+                matrix<float> rhs(3, 3, 2.0f);
+                Assert::AreEqual(12.0f, square_distance(lhs.begin_row(2), lhs.end_row(2), rhs.begin_row(2)), L"0, 0, 0; 2, 2, 2", LINE_INFO());
             }
         }
     };
