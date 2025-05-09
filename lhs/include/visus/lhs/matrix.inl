@@ -103,7 +103,6 @@ LHS_NAMESPACE::matrix<TValue, Layout>::row(
     assert(dst.columns() == this->columns());
     assert(row < this->rows());
 
-
     if ((Layout == matrix_layout::row_major)
             && (L == matrix_layout::row_major)) {
         std::copy(this->_elements.begin() + index(row, 0),
