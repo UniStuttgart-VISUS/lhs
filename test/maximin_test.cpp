@@ -19,8 +19,7 @@ namespace test {
     TEST_CLASS(maximin_test) {
 
         TEST_METHOD(test_optimise_unit) {
-            std::random_device rd;
-            auto lhs = random(4, 3, false, std::mt19937(rd()), std::uniform_real_distribution<float>(0.0f, 1.0f));
+            auto lhs = random(4, 3, false, std::mt19937(0), std::uniform_real_distribution<float>(0.0f, 1.0f));
             Assert::IsTrue(valid(lhs), L"Sample is valid", LINE_INFO());
 
             std::vector<float> distances;
@@ -59,6 +58,28 @@ namespace test {
             }
         }
 
+        TEST_METHOD(test_build) {
+            {
+                matrix<std::size_t> lhs(4, 3);
+                maximin(lhs, 5, std::mt19937(42), std::uniform_real_distribution<float>(0.0f, 1.0f));
+                Assert::IsTrue(valid(lhs), L"Sample is valid", LINE_INFO());
+            }
+
+            {
+                auto lhs = maximin(4, 3, 5, std::mt19937(42), std::uniform_real_distribution<float>(0.0f, 1.0f));
+                Assert::IsTrue(valid(lhs), L"Sample is valid", LINE_INFO());
+            }
+
+            {
+                auto lhs = maximin(4, 3, 5, std::mt19937(42));
+                Assert::IsTrue(valid(lhs), L"Sample is valid", LINE_INFO());
+            }
+
+            {
+                auto lhs = maximin(4, 3, 5);
+                Assert::IsTrue(valid(lhs), L"Sample is valid", LINE_INFO());
+            }
+        }
     };
 
 }

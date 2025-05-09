@@ -120,17 +120,21 @@ inline std::vector<std::size_t> order(
 }
 
 /// <summary>
-/// Creates a order from zero to the size of <paramref name="indices" /> that is
-/// based on sampling the given <paramref name="distribution" /> using the given
-/// <paramref name="rng" />.
+/// Creates a order from zero to the size of [<paramref name="begin" />,
+/// <paramref name="end" />[ that is based on sampling the given
+/// <paramref name="distribution" /> using the given <paramref name="rng" />.
 /// </summary>
+/// <typeparam name="TIterator"> A random iterator over the output range.
+/// </typeparam>
 /// <typeparam name="TLess">A function that determines whether which of the
 /// generated random items is smaller.</typeparam>
+/// <typeparam name="TRng">The type of the random number generator.</typeparam>
 /// <typeparam name="TDist">The type of the distribution to sample the random
 /// items from.</typeparam>
-/// <typeparam name="TRng">The type of the random number generator.</typeparam>
-/// <param name="indices">The buffer receiving the generated permutation. This
-/// buffer also determines the size of the permutation.</param>
+/// <param name="begin">The begin of the output range, which must be an iterator
+/// over indices.</param>
+/// <param name="begin">The end of the output range, which must be an iterator
+/// over indices.</param>
 /// <param name="buffer">A working buffer to create the random numbers. This is
 /// provided to the method in order to allow callers reduce the number of
 /// reallocations required in loops using this function.</param>
@@ -139,14 +143,119 @@ inline std::vector<std::size_t> order(
 /// <param name="rng">The random number generator used to sample the given
 /// <paramref name="distribution" />.</param>
 /// <param name="distribution">The distribution to be sampled.</param>
-/// <returns><paramref name="indices" />.</returns>
-template<class TLess, class TRng, class TDist>
-std::vector<std::size_t>& random_order_by(
-    _Inout_ std::vector<std::size_t>& indices,
+template<class TIterator,class TLess, class TRng, class TDist>
+std::enable_if_t<std::is_integral_v<
+    typename std::iterator_traits<TIterator>::value_type>>
+random_order_by(_In_ TIterator begin,
+    _In_ TIterator end,
     _In_ std::vector<typename TDist::result_type>& buffer,
     _In_ TLess&& less,
     _In_ TRng& rng,
     _In_ TDist& distribution);
+
+/// <summary>
+/// Creates a order from zero to the size of [<paramref name="begin" />,
+/// <paramref name="end" />[ that is based on sampling the given
+/// <paramref name="distribution" /> using the given <paramref name="rng" />.
+/// </summary>
+/// <typeparam name="TIterator"> A random iterator over the output range.
+/// </typeparam>
+/// <typeparam name="TDist">The type of the distribution to sample the random
+/// items from.</typeparam>
+/// <typeparam name="TRng">The type of the random number generator.</typeparam>
+/// <param name="begin">The begin of the output range, which must be an iterator
+/// over indices.</param>
+/// <param name="begin">The end of the output range, which must be an iterator
+/// over indices.</param>
+/// <param name="buffer">A working buffer to create the random numbers. This is
+/// provided to the method in order to allow callers reduce the number of
+/// reallocations required in loops using this function.</param>
+/// <param name="rng">The random number generator used to sample the given
+/// <paramref name="distribution" />.</param>
+/// <param name="distribution">The distribution to be sampled.</param>
+template<class TIterator, class TRng, class TDist>
+inline std::enable_if_t<std::is_integral_v<
+    typename std::iterator_traits<TIterator>::value_type>>
+random_order_by(_In_ TIterator begin,
+        _In_ TIterator end,
+        _In_ std::vector<typename TDist::result_type>& buffer,
+        _In_ TRng& rng,
+        _In_ TDist& distribution) {
+    random_order_by(begin,
+        end,
+        buffer,
+        std::less<typename TDist::result_type>(),
+        rng,
+        distribution);
+}
+
+/// <summary>
+/// Creates a order from zero to the size of <paramref name="buffer" /> that is
+/// based on sampling the given <paramref name="distribution" /> using the
+/// given <paramref name="rng" />.
+/// </summary>
+/// <typeparam name="TLess">A function that determines whether which of the
+/// generated random items is smaller.</typeparam>
+/// <typeparam name="TRng">The type of the random number generator.</typeparam>
+/// <typeparam name="TDist">The type of the distribution to sample the random
+/// items from.</typeparam>
+/// <param name="indices">The buffer receiving the generated permutation. This
+/// buffer also determines the size of the permutation.</param>
+/// <param name="buffer">A working buffer to create the random numbers. This is
+/// provided to the method in order to allow callers reduce the number of
+/// reallocations required in loops using this function.</param>
+/// <param name="rng">The random number generator used to sample the given
+/// <paramref name="distribution" />.</param>
+/// <param name="distribution">The distribution to be sampled.</param>
+/// <returns><paramref name="indices" />.</returns>
+template<class TLess, class TRng, class TDist>
+inline std::vector<std::size_t>& random_order_by(
+        _Inout_ std::vector<std::size_t>& indices,
+        _In_ std::vector<typename TDist::result_type>& buffer,
+        _In_ TLess&& less,
+        _In_ TRng& rng,
+        _In_ TDist& distribution) {
+    random_order_by(indices.begin(),
+        indices.end(),
+        buffer,
+        std::forward<TLess>(less),
+        rng,
+        distribution);
+    return indices;
+}
+
+/// <summary>
+/// Creates a order from zero to the size of <paramref name="buffer" /> that is
+/// based on sampling the given <paramref name="distribution" /> using the
+/// given <paramref name="rng" />.
+/// </summary>
+/// <typeparam name="TRng">The type of the random number generator.</typeparam>
+/// <typeparam name="TDist">The type of the distribution to sample the random
+/// items from.</typeparam>
+/// <param name="indices">The buffer receiving the generated permutation. This
+/// buffer also determines the size of the permutation.</param>
+/// <param name="buffer">A working buffer to create the random numbers. This is
+/// provided to the method in order to allow callers reduce the number of
+/// reallocations required in loops using this function.</param>
+/// <param name="rng">The random number generator used to sample the given
+/// <paramref name="distribution" />.</param>
+/// <param name="distribution">The distribution to be sampled.</param>
+/// <returns><paramref name="indices" />.</returns>
+template<class TRng, class TDist>
+inline std::vector<std::size_t>& random_order_by(
+        _Inout_ std::vector<std::size_t>& indices,
+        _In_ std::vector<typename TDist::result_type>& buffer,
+        _In_ TRng& rng,
+        _In_ TDist& distribution) {
+    random_order_by(indices.begin(),
+        indices.end(),
+        buffer,
+        std::less<typename TDist::result_type>(),
+        rng,
+        distribution);
+    return indices;
+}
+
 
 /// <summary>
 /// Creates a order from zero to the size of <paramref name="indices" /> that is
@@ -171,13 +280,15 @@ template<class TRng, class TDist>
 inline std::vector<std::size_t>& random_order(
         _Inout_ std::vector<std::size_t>& indices,
         _In_ std::vector<typename TDist::result_type>& buffer,
-        _In_ TRng& rng,
-        _In_ TDist& distribution) {
-    return random_order_by(indices,
+        _In_ TRng&& rng,
+        _In_ TDist&& distribution) {
+    random_order_by(indices.begin(),
+        indices.end(),
         buffer,
         std::less<typename TDist::result_type>(),
-        rng,
-        distribution);
+        std::forward<TRng>(rng),
+        std::forward<TDist>(distribution));
+    return indices;
 }
 
 /// <summary>

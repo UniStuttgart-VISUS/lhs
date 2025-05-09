@@ -74,92 +74,134 @@ LHS_NAMESPACE::maximin(_Inout_ matrix<TValue, Layout>& lhs,
     return lhs;
 }
 
-#if false
+
 /*
- * LHS_NAMESPACE::centred
+ * LHS_NAMESPACE::maximin
  */
-template<class TValue,
-    LHS_NAMESPACE::matrix_layout Layout,
-    class TRng,
-    class TDist>
-std::enable_if_t<std::is_floating_point_v<TValue>,
-    LHS_NAMESPACE::matrix<TValue, Layout>&>
-LHS_NAMESPACE::centred(_Inout_ matrix<TValue, Layout>& result,
-        _In_ TRng& rng,
-        _In_ TDist& distribution) {
-    constexpr auto half = static_cast<TValue>(0.5);
-    // Derived from https://github.com/relf/egobox/blob/15a1225454f4d1c06df2301b9b5b69a9c900c788/crates/doe/src/lhs.rs#L253-L267
+template<LHS_NAMESPACE::matrix_layout Layout, class TRng, class TDist>
+LHS_NAMESPACE::matrix<std::size_t, Layout> LHS_NAMESPACE::maximin(
+        _Inout_ matrix<std::size_t, Layout>& result,
+        _In_ const std::size_t duplication,
+        _In_ TRng&& rng,
+        _In_ TDist&& distribution) {
+    // Derived from https://github.com/bertcarnell/lhs/blob/4be72495c0eba3ce0b1ae602122871ec83421db6/src/maximinLHS.cpp#L40-L198
+    typedef typename TDist::result_type float_type;
+    static constexpr auto one = static_cast<std::size_t>(1);
+    static constexpr auto zero = static_cast<std::size_t>(0);
+
+    // Create a random index in [0, n[ from 'rng' and 'distribution'.
+    const auto random_index = [&rng, &distribution](const std::size_t n) {
+        assert(n > 0);
+        auto v = distribution(rng) * static_cast<float_type>(n - 1);
+        return static_cast<std::size_t>(std::floor(v));
+    };
+
+    // Cache the number of samples 'n' and parameters 'k'.
     const auto n = result.rows();
     const auto k = result.columns();
-    std::vector<std::size_t> indices(n);
-    std::vector<TValue> samples(n);
-    std::vector<TValue> values(n);
 
-    // Create the interval centres to select from.
-    const auto step = static_cast<TValue>(1) / static_cast<TValue>(n);
-    for (std::size_t i = 0; i < n; ++i) {
-        samples[i] = (i + half) * step;
+    // Length of candidate points.
+    assert(n > 0);
+    const auto len = duplication * ((std::max)(n, one) - one);
+
+    matrix<std::size_t, Layout> avail(n, k);
+    matrix<std::size_t, Layout> point1(len, k);
+    std::vector<std::size_t> list1(len);
+
+    // Initialise the availability matrix.
+    detail::initialise_availability(avail);
+
+    for (std::size_t c = 0; c < k; ++c) {
+        // Come up with a random sample in the last row of the 'result'.
+        const auto r = random_index(n);
+        result(n - 1, c) = r;
+
+        // Use the random order we just created to place an the index of the
+        // last sample value randomly through the 'avail' matrix.
+        avail(r, c) = n - 1;
     }
 
-    // Create the samples from 'values'.
+    // Move backwards through the samples in 'result' and fill them.
+    for (std::size_t s = n - 1; s > 0; --s) {
+        for (std::size_t c = 0; c < k; ++c) {
+            for (std::size_t r = 0; r < duplication; ++r) {
+                for (std::size_t i = 0; i < s; ++i) {
+                    list1[i + r * s] = avail(i, c);
+                }
+            }
+
+            for (std::size_t r = s * duplication; r > 0; --r) {
+                auto v = random_index(r);
+                point1(r - 1, c) = list1[v];
+                list1[v] = list1[r - 1];
+            }
+        }
+
+        auto min_idx = zero;
+        auto min_val = zero;
+
+        for (std::size_t r = 0; r + 1 < duplication * s; ++r) {
+            // Search the candidate point with the minimum distance.
+            auto dist = (std::numeric_limits<std::size_t>::max)();
+
+            // Compute the squared distance between the candidate points and the
+            // points already in the sample and remember the smallest one.
+            for (std::size_t i = s; i < n; ++i) {
+                auto d = zero;
+
+                for (std::size_t j = 0; j < k; ++j) {
+                    d += square(point1(r, j) - result(i, j));
+                }
+
+                if (d < dist) {
+                    dist = d;
+                }
+            }
+
+            // Remember the point if the minimum distance is the largest so far.
+            if (dist > min_val) {
+                min_val = dist;
+                min_idx = r;
+            }
+        }
+
+        // Commit the best candidate to the sample.
+        for (std::size_t c = 0; c < k; ++c) {
+            result(s - 1, c) = point1(min_idx, c);
+        }
+
+        // Update the availability of the remaining points.
+        for (std::size_t c = 0; c < k; ++c) {
+            for (std::size_t r = 0; r < n; ++r) {
+                if (avail(r, c) == result(s - 1, c)) {
+                    avail(r, c) = avail(s - 1, c);
+                }
+            }
+        }
+    }
+
+    // There is only one choice left for the last sample.
     for (std::size_t c = 0; c < k; ++c) {
-        for (std::size_t r = 0; r < n; ++r) {
-            values[r] = static_cast<TValue>(distribution(rng));
-        }
-
-        detail::order(indices, values.begin(), values.end());
-
-        for (std::size_t r = 0; r < n; ++r) {
-            result(r, c) = samples[indices[r]];
-        }
+        result(0, c) = avail(0, c);
     }
 
     ASSERT_VALID_LHS(result);
     return result;
 }
 
+
 /*
- * LHS_NAMESPACE::centred
+ * LHS_DETAIL_NAMESPACE::initialise_availability
  */
-template<class TIterator, class TRng, class TDist>
-inline std::enable_if_t<LHS_DETAIL_NAMESPACE::is_range_v<
-        typename std::iterator_traits<TIterator>::value_type>
-    && std::is_floating_point_v<
-        typename std::iterator_traits<TIterator>::value_type::value_type>,
-    LHS_NAMESPACE::matrix<
-        typename std::iterator_traits<TIterator>::value_type::value_type>>
-LHS_NAMESPACE::centred(_In_ const std::size_t samples,
-        _In_ const TIterator& begin,
-        _In_ const TIterator& end,
-        _In_ TRng& rng,
-        _In_ TDist& distribution) {
-    typedef typename std::iterator_traits<TIterator>::value_type range_type;
-    typedef typename range_type::value_type value_type;
+template<LHS_NAMESPACE::matrix_layout Layout>
+LHS_NAMESPACE::matrix<std::size_t, Layout>&
+LHS_DETAIL_NAMESPACE::initialise_availability(
+        _Inout_ matrix<std::size_t, Layout>& mat) {
+    static constexpr auto zero = static_cast<std::size_t>(0);
 
-    constexpr auto half = static_cast<value_type>(0.5);
-    const auto k = std::distance(begin, end);
-    std::vector<std::size_t> indices(samples);
-    matrix<value_type> retval(samples, k);
-    std::vector<value_type> values(samples);
-
-    std::size_t c = 0;
-    for (auto it = begin; it != end; ++it, ++c) {
-        for (std::size_t r = 0; r < samples; ++r) {
-            values[r] = static_cast<value_type>(distribution(rng));
-        }
-
-        detail::order(indices, values.begin(), values.end());
-
-        auto step = it->distance() / static_cast<value_type>(samples);
-        for (std::size_t i = 0; i < samples; ++i) {
-            values[i] = (i + half) * step + it->begin();
-        }
-
-        for (std::size_t r = 0; r < samples; ++r) {
-            retval(r, c) = values[indices[r]];
-        }
+    for (std::size_t c = 0, e = mat.columns(); c < e; ++c) {
+        std::iota(mat.begin_column(c), mat.end_column(c), zero);
     }
 
-    return retval;
+    return mat;
 }
-#endif

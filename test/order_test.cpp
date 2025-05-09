@@ -8,6 +8,7 @@
 
 #include <CppUnitTest.h>
 
+#include "visus/lhs/matrix.h"
 #include "visus/lhs/order.h"
 
 using namespace Microsoft::VisualStudio::CppUnitTestFramework;
@@ -160,7 +161,18 @@ namespace test {
         TEST_METHOD(test_random_order_by_dist) {
             std::vector<std::size_t> indices(5);
             std::vector<float> buffer;
-            random_order_by(indices, buffer, std::less<float>(), std::mt19937(0), std::uniform_real_distribution<float>());
+            random_order_by(indices.begin(), indices.end(), buffer, std::less<float>(), std::mt19937(0), std::uniform_real_distribution<float>());
+            Assert::IsTrue(indices[0] < indices.size(), L"0", LINE_INFO());
+            Assert::IsTrue(indices[1] < indices.size(), L"1", LINE_INFO());
+            Assert::IsTrue(indices[2] < indices.size(), L"2", LINE_INFO());
+            Assert::IsTrue(indices[3] < indices.size(), L"3", LINE_INFO());
+            Assert::IsTrue(indices[4] < indices.size(), L"4", LINE_INFO());
+        }
+
+        TEST_METHOD(test_random_order_by_dist_std_less) {
+            std::vector<std::size_t> indices(5);
+            std::vector<float> buffer;
+            random_order_by(indices.begin(), indices.end(), buffer, std::mt19937(0), std::uniform_real_distribution<float>());
             Assert::IsTrue(indices[0] < indices.size(), L"0", LINE_INFO());
             Assert::IsTrue(indices[1] < indices.size(), L"1", LINE_INFO());
             Assert::IsTrue(indices[2] < indices.size(), L"2", LINE_INFO());
