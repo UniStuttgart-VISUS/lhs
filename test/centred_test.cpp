@@ -1,4 +1,4 @@
-﻿// <copyright file="test_centred.cpp" company="Visualisierungsinstitut der Universität Stuttgart">
+﻿// <copyright file="centred_test.cpp" company="Visualisierungsinstitut der Universität Stuttgart">
 // Copyright © 2025 Visualisierungsinstitut der Universität Stuttgart.
 // Licensed under the MIT licence. See LICENCE file for details.
 // </copyright>
@@ -15,7 +15,7 @@ using namespace visus::lhs::detail;
 
 namespace test {
 
-    TEST_CLASS(test_centred) {
+    TEST_CLASS(centred_test) {
 
         TEST_METHOD(test_unit) {
             const auto lhs = centred(4, 3, std::mt19937(0), std::uniform_real_distribution<float>(0.0f, 1.0f));

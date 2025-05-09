@@ -1,4 +1,4 @@
-﻿// <copyright file="test_random.cpp" company="Visualisierungsinstitut der Universität Stuttgart">
+﻿// <copyright file="(random_test.cpp" company="Visualisierungsinstitut der Universität Stuttgart">
 // Copyright © 2025 Visualisierungsinstitut der Universität Stuttgart.
 // Licensed under the MIT licence. See LICENCE file for details.
 // </copyright>
@@ -15,7 +15,7 @@ using namespace visus::lhs::detail;
 
 namespace test {
 
-    TEST_CLASS(test_random) {
+    TEST_CLASS(random_test) {
 
         TEST_METHOD(test_indices) {
             const auto lhs = random(4, 3, std::mt19937(0), std::uniform_real_distribution<float>(0.0f, 1.0f));

@@ -1,19 +1,21 @@
-﻿// <copyright file="square_difference.h" company="Visualisierungsinstitut der Universität Stuttgart">
+﻿// <copyright file="distance.h" company="Visualisierungsinstitut der Universität Stuttgart">
 // Copyright © 2025 Visualisierungsinstitut der Universität Stuttgart.
 // Licensed under the MIT licence. See LICENCE file for details.
 // </copyright>
 // <author>Christoph Müller</author>
 
-#if !defined(_LHS_SQUARE_DIFFERENCE_H)
-#define _LHS_SQUARE_DIFFERENCE_H
+#if !defined(_LHS_SQUARE_DISTANCE_H)
+#define _LHS_SQUARE_DISTANCE_H
 #pragma once
 
+#include <algorithm>
 #include <cassert>
 #include <numeric>
+#include <tuple>
 #include <type_traits>
 #include <vector>
 
-#include "visus/lhs/api.h"
+#include "visus/lhs/matrix.h"
 
 
 LHS_DETAIL_NAMESPACE_BEGIN
@@ -93,6 +95,23 @@ square_distance(
         square_difference<value_type>);
 }
 
+/// <summary>
+/// Computes the squared distances between all pairs of rows in a matrix.
+/// </summary>
+/// <typeparam name="TValue">The type of the elements in the matrix.</typeparam>
+/// <typeparam name="Layout">The memory layout of the matrix.</typeparam>
+/// <param name="result">Receives the distances, first from the first row to
+/// all subsequent ones, then from the second one to all subsequent ones, etc.
+/// This is effectively a triangular matrix omitting all duplicates.</param>
+/// <param name="mat">The matrix to compute the distances for.</param>
+/// <returns><paramref name="result" />.</returns>
+template<class TValue, matrix_layout Layout>
+std::enable_if_t<std::is_arithmetic_v<TValue>, std::vector<TValue>&>
+square_row_distances(_Out_ std::vector<TValue>& result,
+    _In_ const matrix<TValue, Layout>& mat);
+
 LHS_DETAIL_NAMESPACE_END
 
-#endif /* !defined(_LHS_SQUARE_DIFFERENCE_H) */
+#include "visus/lhs/distance.inl"
+
+#endif /* !defined(_LHS_SQUARE_DISTANCE_H) */
