@@ -68,8 +68,8 @@ template<matrix_layout Layout, class TRng, class TDist>
 matrix<std::size_t, Layout> maximin(
     _Inout_ matrix<std::size_t, Layout>& result,
     _In_ const std::size_t duplication,
-    _In_ TRng&& rng,
-    _In_ TDist&& distribution);
+    _In_ TRng& rng,
+    _In_ TDist& distribution);
 
 /// <summary>
 /// Creates a maximin-optimised Latin Hypercube sample of zero-based indices.

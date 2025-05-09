@@ -82,17 +82,17 @@ template<LHS_NAMESPACE::matrix_layout Layout, class TRng, class TDist>
 LHS_NAMESPACE::matrix<std::size_t, Layout> LHS_NAMESPACE::maximin(
         _Inout_ matrix<std::size_t, Layout>& result,
         _In_ const std::size_t duplication,
-        _In_ TRng&& rng,
-        _In_ TDist&& distribution) {
+        _In_ TRng& rng,
+        _In_ TDist& distribution) {
     // Derived from https://github.com/bertcarnell/lhs/blob/4be72495c0eba3ce0b1ae602122871ec83421db6/src/maximinLHS.cpp#L40-L198
     typedef typename TDist::result_type float_type;
     static constexpr auto one = static_cast<std::size_t>(1);
     static constexpr auto zero = static_cast<std::size_t>(0);
 
-    // Create a random index in [0, n[ from 'rng' and 'distribution'.
+    // Create a random index in [0, n] from 'rng' and 'distribution'.
     const auto random_index = [&rng, &distribution](const std::size_t n) {
         assert(n > 0);
-        auto v = distribution(rng) * static_cast<float_type>(n - 1);
+        auto v = distribution(rng) * static_cast<float_type>(n);
         return static_cast<std::size_t>(std::floor(v));
     };
 

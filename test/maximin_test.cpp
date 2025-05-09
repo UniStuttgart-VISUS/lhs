@@ -9,6 +9,8 @@
 #include "visus/lhs/maximin.h"
 #include "visus/lhs/random.h"
 
+#include "reference_distribution.h"
+
 using namespace Microsoft::VisualStudio::CppUnitTestFramework;
 using namespace visus::lhs;
 using namespace visus::lhs::detail;
@@ -79,6 +81,28 @@ namespace test {
                 auto lhs = maximin(4, 3, 5);
                 Assert::IsTrue(valid(lhs), L"Sample is valid", LINE_INFO());
             }
+        }
+
+        TEST_METHOD(test_build_against_r) {
+            reference_distribution dist(1976, 1968);
+            matrix<std::size_t> lhs(4, 3);
+            maximin(lhs, 5, std::mt19937(42), dist);
+            Assert::IsTrue(valid(lhs), L"Sample is valid", LINE_INFO());
+
+            // Expected values from https://github.com/bertcarnell/lhslib/blob/557bec455c5bf2d20438bbace2096c2a7e3823ff/src/lhstest/maximinLHS_RTest.cpp#L43-L46
+            // Note that R uses one-based indices whereas we use zero-based ones.
+            Assert::AreEqual(std::size_t(3), lhs[0], L"0", LINE_INFO());
+            Assert::AreEqual(std::size_t(0), lhs[1], L"1", LINE_INFO());
+            Assert::AreEqual(std::size_t(2), lhs[2], L"2", LINE_INFO());
+            Assert::AreEqual(std::size_t(1), lhs[3], L"3", LINE_INFO());
+            Assert::AreEqual(std::size_t(3), lhs[4], L"4", LINE_INFO());
+            Assert::AreEqual(std::size_t(0), lhs[5], L"5", LINE_INFO());
+            Assert::AreEqual(std::size_t(0), lhs[6], L"6", LINE_INFO());
+            Assert::AreEqual(std::size_t(2), lhs[7], L"7", LINE_INFO());
+            Assert::AreEqual(std::size_t(3), lhs[8], L"8", LINE_INFO());
+            Assert::AreEqual(std::size_t(2), lhs[9], L"9", LINE_INFO());
+            Assert::AreEqual(std::size_t(1), lhs[10], L"10", LINE_INFO());
+            Assert::AreEqual(std::size_t(1), lhs[11], L"11", LINE_INFO());
         }
     };
 
