@@ -30,6 +30,10 @@ LHS_NAMESPACE_BEGIN
 /// <summary>
 /// Fill <paramref name="result" /> with a Latin Hypercube sample.
 /// </summary>
+/// <remarks>
+/// This function creates what the R implmenetation also calls a
+/// &quot;grid&quot; of samples.
+/// </remarks>
 /// <typeparam name="Layout">The memory layout of the matrix. It is reasonable
 /// to use row-major matrices here, because in this case, the parameter values
 /// for a sample are laid out contiguously in memory.</typeparam>
@@ -56,6 +60,10 @@ matrix<std::size_t, Layout>& random(
 /// <summary>
 /// Fill <paramref name="result" /> with a Latin Hypercube sample.
 /// </summary>
+/// <remarks>
+/// This function creates what the R implmenetation also calls a
+/// &quot;grid&quot; of samples.
+/// </remarks>
 /// <typeparam name="Layout">The memory layout of the matrix. It is reasonable
 /// to use row-major matrices here, because in this case, the parameter values
 /// for a sample are laid out contiguously in memory.</typeparam>
@@ -77,8 +85,35 @@ inline matrix<std::size_t, Layout>& random(
 }
 
 /// <summary>
+/// Fill <paramref name="result" /> with a Latin Hypercube sample.
+/// </summary>
+/// <remarks>
+/// This function creates what the R implmenetation also calls a
+/// &quot;grid&quot; of samples.
+/// </remarks>
+/// <typeparam name="Layout">The memory layout of the matrix. It is reasonable
+/// to use row-major matrices here, because in this case, the parameter values
+/// for a sample are laid out contiguously in memory.</typeparam>
+/// <param name="result">The matrix to receive the Latin Hypercube sample. The
+/// values are ignored on entry. However, the number of rows represents the
+/// number of samples for each parameter whereas the number of columns
+/// represents the number of parameters.</param>
+/// <returns><paramref name="result" />.</returns>
+template<matrix_layout Layout, class TRng>
+inline matrix<std::size_t, Layout>& random(
+        _Inout_ matrix<std::size_t, Layout>& result) {
+    std::random_device rd;
+    std::mt19937 rng(rd());
+    return random(result, rng, std::uniform_real_distribution<float>());
+}
+
+/// <summary>
 /// Create a Latin Hypercube sample.
 /// </summary>
+/// <remarks>
+/// This function creates what the R implmenetation also calls a
+/// &quot;grid&quot; of samples.
+/// </remarks>
 /// <typeparam name="TRng">The type of the random number generator.</typeparam>
 /// <typeparam name="TDist">The type of the distribution used to generate random
 /// numbers.</typeparam>
@@ -108,6 +143,10 @@ inline matrix<std::size_t> random(
 /// <summary>
 /// Create a Latin Hypercube sample.
 /// </summary>
+/// <remarks>
+/// This function creates what the R implmenetation also calls a
+/// &quot;grid&quot; of samples.
+/// </remarks>
 /// <typeparam name="TRng">The type of the random number generator.</typeparam>
 /// <param name="samples">The number of samples per parameter (rows) of the
 /// Latin hypercube sample.</param>
@@ -127,6 +166,29 @@ inline matrix<std::size_t> random(
     return random(result,
         std::forward<TRng>(rng),
         std::uniform_real_distribution<float>());
+}
+
+/// <summary>
+/// Create a Latin Hypercube sample.
+/// </summary>
+/// <remarks>
+/// This function creates what the R implmenetation also calls a
+/// &quot;grid&quot; of samples.
+/// </remarks>
+/// <param name="samples">The number of samples per parameter (rows) of the
+/// Latin hypercube sample.</param>
+/// <param name="parameters">The number of parameters (columns) in the
+/// Latin hypercube sample.</param>
+/// <param name="rng">The random number generator used to sample a uniform
+/// real distribution within [0, 1].</param>
+/// <returns></returns>
+inline matrix<std::size_t> random(
+        _In_ const std::size_t samples,
+        _In_ const std::size_t parameters) {
+    matrix<std::size_t> result(samples, parameters);
+    std::random_device rd;
+    std::mt19937 rng(rd());
+    return random(result, rng, std::uniform_real_distribution<float>());
 }
 
 /// <summary>
