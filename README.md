@@ -7,3 +7,50 @@ The library is header-only, so you only need to copy the [include](lhs/include/)
 ## Usage
 The library will create Latin hypercube samples in the form of [matrix](lhs/include/visus/lhs/matrix.h) instances. Each row of the matrices represent a single sample whereas each column represents a parameter. There are usually two types of samples, the ones yielding integer matrices and the ones yielding floating-point matrices. In case of the former, the matrix elements represent zero-based indices into the parameter ranges, whatever these may be. For instance, if a parameter is a numeric value, the index represents the selected qantile of the overall range. If you have categorical parameters, it might represent the category. The floating-point samples are typically from a unit hypercube. You may scale them as necessary.
 
+### Create a unit hypercube sample
+The following most basic code creates a four samples with three parameters on a unit hypercube:
+```c++
+auto lhs = visus::lhs::random<float>(4, 3);
+```
+
+You can also provide your own random number generator like this, for instance if you need to have a specific random seed:
+```c++
+auto lhs = visus::lhs::random<float>(4, 3, false, std::mt19937(42));
+```
+
+Finally, it is possible to specify a specific random number distribution, which should, however, typically be a `std::uniform_real_distribution` within [0, 1]. The ability to change this is used for testing and should typically not be required for end users:
+```c++
+auto lhs =visus::lhs::random(4, 3, false, std::mt19937(42), std::uniform_real_distribution<float>(0.0f, 1.0f));
+```
+
+A centred sample can be created like this:
+```c++
+auto lhs = visus::lhs::centred<float>(4, 3);
+```
+
+You can perform maximin optimisation (maximise the pairwise distance between the samples) on an existing sample:
+```c++
+auto lhs = visus::lhs::random<float>(4, 3);
+maximin(lhs);
+```
+
+### Create a discrete sample
+The following most basic code creates four samples with values wihtin [0, 4[ for the three parameters:
+```c++
+auto lhs = visus::lhs::random<std::size_t>(4, 3);
+```
+
+### Sample your own numeric and categorical data
+The library provides a [sample](lhs/include/visus/lhs/sample.h) convenience function that allows users to create samples of differently shaped parameters in the form of `std::tuple`s. It is based on scaling a unit hypercube sample to the user-defined ranges. The following code creates four samples of a categorical parameter, an range of consecutive integer values and a range of floating-point values:
+```c++
+auto lhs = visus::lhs::sample([](const std::size_t parameters) {
+        return visus::lhs::random<float>(4, parameters);
+    },
+    std::vector<std::string>({ "Category 1", "Category 2" }),
+    visus::lhs::make_range(1, 100),
+    visus::lhs::make_range(0.0f, 1.0f));
+```
+The first parameter is a callback that creates the unit hypercube sample. This way, it is possible for you to choose how the Latin hypercube sample is created. However, it is mandatory that the sample returned (i) is from a unit hypercube, (ii) returns a floating-point matrix and (iii) has the requested number of columns, which is equivalent to the number of parameters specified after the callback (three in the case of the example). The number of rows of the matrix returned determines the number of sample points and can be chosen freely.
+
+## Acknowledgments
+This work was partially funded by Deutsche Forschungsgemeinschaft (DFG) as part of [SFB/Transregio 161](https://www.sfbtrr161.de) (project ID 251654672).
