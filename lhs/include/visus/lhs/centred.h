@@ -111,6 +111,30 @@ centred(_In_ const std::size_t samples,
 }
 
 /// <summary>
+/// Create a uniformly distributed stratified sample from unit hypercube
+/// placing the values in the centre of the <paramref name="samples" />
+/// intervals.
+/// </summary>
+/// <typeparam name="TValue">The type of values to be created, which must be a
+/// floating point type.</typeparam>
+/// <param name="samples">The number of samples to draw (the number of rows in
+/// the resulting matrix).</param>
+/// <param name="parameters">The number of parameters (columns in the resulting
+/// matrix), which will all be within [0, 1].</param>
+/// <param name="preserve_draw">Indicates whether the order of the draw should
+/// be preserved if less columns are selected.</param>
+/// <returns></returns>
+template<class TValue, class TRng>
+inline std::enable_if_t<std::is_floating_point_v<TValue>, matrix<TValue>>
+centred(_In_ const std::size_t samples,
+        _In_ const std::size_t parameters) {
+    std::random_device rd;
+    std::mt19937 rng(rd());
+    matrix<TValue> result(samples, parameters);
+    return centred(result, rng, std::uniform_real_distribution<TValue>());
+}
+
+/// <summary>
 /// Create a (uniformly distributed and centred) stratified sample from a
 /// hypercube with the given parameter <see cref="range{TValue}" />s.
 /// </summary>
