@@ -43,7 +43,9 @@ auto lhs = visus::lhs::random<std::size_t>(4, 3);
 ### Sample your own numeric and categorical data
 The library provides a [sample](lhs/include/visus/lhs/sample.h) convenience function that allows users to create samples of differently shaped parameters in the form of `std::tuple`s. It is based on scaling a unit hypercube sample to the user-defined ranges. The following code creates four samples of a categorical parameter, an range of consecutive integer values and a range of floating-point values:
 ```c++
-auto lhs = visus::lhs::sample([](const std::size_t parameters) {
+auto lhs = visus::lhs::sample(
+    [](const std::size_t parameters) {
+        // Request four sample points. The number of columns must be 'parameters'.
         return visus::lhs::random<float>(4, parameters);
     },
     std::vector<std::string>({ "Category 1", "Category 2" }),
