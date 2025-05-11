@@ -9,6 +9,8 @@
 #pragma once
 
 #include <algorithm>
+#include <initializer_list>
+#include <stdexcept>
 
 #include "visus/lhs/api.h"
 
@@ -39,6 +41,14 @@ public:
             _In_ const value_type end = static_cast<value_type>(0)) noexcept
         : _begin((std::min)(begin, end)),
             _end((std::max)(begin, end)) { }
+
+    /// <summary>
+    /// Initialises a new instance.
+    /// </summary>
+    /// <param name="initialiser">An initialiser list of at least two elements.</param>
+    /// <exception cref="std::invalid_argument">If the initialiser list does not contain
+    /// at least two elements.</exception>
+    range(_In_ const std::initializer_list<value_type>& initialiser);
 
     /// <summary>
     /// Answer the begin of the range.
@@ -95,7 +105,8 @@ private:
 /// <returns>The range between <paramref name="begin" /> and
 /// <paramref name="end" />.</returns>
 template<class TValue>
-inline constexpr range<TValue> make_range(_In_ const TValue begin,
+inline constexpr range<TValue> make_range(
+        _In_ const TValue begin,
         _In_ const TValue end) noexcept {
     return range<TValue>(begin, end);
 }
@@ -110,11 +121,14 @@ inline constexpr range<TValue> make_range(_In_ const TValue begin,
 /// <returns>The range between <paramref name="begin" /> and
 /// <paramref name="begin" /> + <paramref name="distance" />.</returns>
 template<class TValue>
-inline constexpr range<TValue> range_from_distance(_In_ const TValue begin,
-    _In_ const TValue distance) noexcept {
+inline constexpr range<TValue> range_from_distance(
+        _In_ const TValue begin,
+        _In_ const TValue distance) noexcept {
     return range<TValue>(begin, begin + distance);
 }
 
 LHS_NAMESPACE_END
+
+#include "visus/lhs/range.inl"
 
 #endif /* !defined(_LHS_RANGE_H) */

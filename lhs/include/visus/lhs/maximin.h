@@ -91,10 +91,8 @@ template<matrix_layout Layout, class TRng>
 inline matrix<std::size_t, Layout> maximin(
         _Inout_ matrix<std::size_t, Layout>& result,
         _In_ const std::size_t duplication,
-        _In_ TRng&& rng) {
-    return maximin(result,
-        duplication,
-        std::forward<TRng>(rng),
+        _In_ TRng& rng) {
+    return maximin(result, duplication, rng,
         std::uniform_real_distribution<float>());
 }
 
@@ -142,13 +140,10 @@ template<class TRng, class TDist>
 inline matrix<std::size_t> maximin(_In_ const std::size_t samples,
         _In_ const std::size_t parameters,
         _In_ const std::size_t duplication,
-        _In_ TRng&& rng,
-        _In_ TDist&& distribution) {
+        _In_ TRng& rng,
+        _In_ TDist& distribution) {
     matrix<std::size_t> result(samples, parameters);
-    return maximin(result,
-        duplication,
-        std::forward<TRng>(rng),
-        std::forward<TDist>(distribution));
+    return maximin(result, duplication, rng, distribution);
 }
 
 /// <summary>
@@ -168,11 +163,9 @@ template<class TRng>
 inline matrix<std::size_t> maximin(_In_ const std::size_t samples,
         _In_ const std::size_t parameters,
         _In_ const std::size_t duplication,
-        _In_ TRng&& rng) {
+        _In_ TRng& rng) {
     matrix<std::size_t> result(samples, parameters);
-    return maximin(result,
-        duplication,
-        std::forward<TRng>(rng),
+    return maximin(result, duplication, rng,
         std::uniform_real_distribution<float>());
 }
 

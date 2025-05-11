@@ -78,12 +78,10 @@ template<class TRng, class TDist>
 inline matrix<typename TDist::result_type> centred(
         _In_ const std::size_t samples,
         _In_ const std::size_t parameters,
-        _In_ TRng&& rng,
-        _In_ TDist&& distribution) {
+        _In_ TRng& rng,
+        _In_ TDist& distribution) {
     matrix<typename TDist::result_type> result(samples, parameters);
-    return centred(result,
-        std::forward<TRng>(rng),
-        std::forward<TDist>(distribution));
+    return centred(result, rng, distribution);
 }
 
 /// <summary>
@@ -107,13 +105,10 @@ template<class TValue, class TRng>
 inline std::enable_if_t<std::is_floating_point_v<TValue>, matrix<TValue>>
 centred(_In_ const std::size_t samples,
         _In_ const std::size_t parameters,
-        _In_ TRng&& rng) {
+        _In_ TRng& rng) {
     matrix<TValue> result(samples, parameters);
-    return centred(result,
-        std::forward<TRng>(rng),
-        std::uniform_real_distribution<TValue>());
+    return centred(result, rng, std::uniform_real_distribution<TValue>());
 }
-
 
 /// <summary>
 /// Create a (uniformly distributed and centred) stratified sample from a
@@ -190,14 +185,12 @@ inline std::enable_if_t<detail::is_range_v<
 centred(_In_ const std::size_t samples,
         _In_ TIterator&& begin,
         _In_ TIterator&& end,
-        _In_ TRng&& rng) {
+        _In_ TRng& rng) {
     typedef typename std::iterator_traits<TIterator>::value_type range_type;
     typedef typename range_type::value_type value_type;
     typedef make_floating_point_t<value_type> float_type;
-    return centred(samples,
-        std::forward<TIterator>(begin),
-        std::forward<TIterator>(end),
-        std::forward<TRng>(rng),
+    return centred(samples, std::forward<TIterator>(begin),
+        std::forward<TIterator>(end), rng,
         std::uniform_real_distribution<float_type>());
 }
 
@@ -230,13 +223,10 @@ centred(_In_ const std::size_t samples,
 template<class TValue, class TRng, class TDist>
 inline matrix<TValue> centred(_In_ const std::size_t samples,
         _In_ const std::initializer_list<range<TValue>>& parameters,
-        _In_ TRng&& rng,
-        _In_ TDist&& distribution) {
-    return centred(samples,
-        parameters.begin(),
-        parameters.end(),
-        std::forward<TRng>(rng),
-        std::forward<TDist>(distribution));
+        _In_ TRng& rng,
+        _In_ TDist& distribution) {
+    return centred(samples, parameters.begin(), parameters.end(), rng,
+        distribution);
 }
 
 /// <summary>
@@ -262,14 +252,10 @@ inline matrix<TValue> centred(_In_ const std::size_t samples,
 template<class TValue, class TRng, class TDist>
 inline matrix<TValue> centred(_In_ const std::size_t samples,
         _In_ const std::initializer_list<range<TValue>>& parameters,
-        _In_ TRng&& rng) {
-    return centred(samples,
-        parameters.begin(),
-        parameters.end(),
-        std::forward<TRng>(rng),
-        std::uniform_real_distribution<TValue>());
+        _In_ TRng& rng) {
+    return centred(samples, parameters.begin(), parameters.end(),
+        rng, std::uniform_real_distribution<TValue>());
 }
-
 
 LHS_NAMESPACE_END
 

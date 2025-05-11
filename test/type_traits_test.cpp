@@ -15,6 +15,7 @@
 #include "visus/lhs/is_range.h"
 #include "visus/lhs/make_floating_point.h"
 #include "visus/lhs/matrix.h"
+#include "visus/lhs/sample_type.h"
 
 using namespace Microsoft::VisualStudio::CppUnitTestFramework;
 using namespace visus::lhs;
@@ -49,6 +50,22 @@ namespace test {
             Assert::IsTrue(std::is_same_v<float, make_floating_point_t<std::int16_t>>, L"int16_t", LINE_INFO());
             Assert::IsTrue(std::is_same_v<float, make_floating_point_t<std::int32_t>>, L"int32_t", LINE_INFO());
             Assert::IsTrue(std::is_same_v<double, make_floating_point_t<std::int64_t>>, L"int64_t", LINE_INFO());
+        }
+
+        TEST_METHOD(test_sample_value_type) {
+            Assert::IsTrue(std::is_same_v<float, sample_value_type_t<std::array<float, 3>>>, L"std::array<float, 3>", LINE_INFO());
+            Assert::IsTrue(std::is_same_v<float, sample_value_type_t<std::initializer_list<float>>>, L"std::initializer_list<float>", LINE_INFO());
+            Assert::IsTrue(std::is_same_v<float, sample_value_type_t<std::list<float>>>, L"std::list<float>", LINE_INFO());
+            Assert::IsTrue(std::is_same_v<float, sample_value_type_t<std::set<float>>>, L"std::set<float>", LINE_INFO());
+            Assert::IsTrue(std::is_same_v<float, sample_value_type_t<std::vector<float>>>, L"std::vector<float>", LINE_INFO());
+            Assert::IsTrue(std::is_same_v<float, sample_value_type_t<range<float>>>, L"range<float>", LINE_INFO());
+            Assert::IsTrue(std::is_same_v<float, sample_value_type_t<float>>, L"float", LINE_INFO());
+        }
+
+        TEST_METHOD(test_sample_type) {
+            Assert::IsTrue(std::is_same_v<std::tuple<float>, sample_type_t<std::array<float, 3>>>, L"std::array<float, 3>", LINE_INFO());
+            Assert::IsTrue(std::is_same_v<std::tuple<float, float>, sample_type_t<std::array<float, 3>, range<float>>>, L"std::array<float, 3>, range<float>", LINE_INFO());
+            Assert::IsTrue(std::is_same_v<std::tuple<int, float>, sample_type_t<std::array<int, 3>, range<float>>>, L"std::array<int, 3>, range<float>", LINE_INFO());
         }
     };
 

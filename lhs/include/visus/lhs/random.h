@@ -78,10 +78,8 @@ matrix<std::size_t, Layout>& random(
 template<matrix_layout Layout, class TRng>
 inline matrix<std::size_t, Layout>& random(
         _Inout_ matrix<std::size_t, Layout>& result,
-        _In_ TRng&& rng) {
-    return random(result,
-        std::forward<TRng>(rng),
-        std::uniform_real_distribution<float>());
+        _In_ TRng& rng) {
+    return random(result, rng, std::uniform_real_distribution<float>());
 }
 
 /// <summary>
@@ -132,12 +130,10 @@ template<class TRng, class TDist>
 inline matrix<std::size_t> random(
         _In_ const std::size_t samples,
         _In_ const std::size_t parameters,
-        _In_ TRng&& rng,
-        _In_ TDist&& distribution) {
+        _In_ TRng& rng,
+        _In_ TDist& distribution) {
     matrix<std::size_t> result(samples, parameters);
-    return random(result,
-        std::forward<TRng>(rng),
-        std::forward<TDist>(distribution));
+    return random(result, rng, distribution);
 }
 
 /// <summary>
@@ -161,11 +157,9 @@ template<class TRng>
 inline matrix<std::size_t> random(
         _In_ const std::size_t samples,
         _In_ const std::size_t parameters,
-        _In_ TRng&& rng) {
+        _In_ TRng& rng) {
     matrix<std::size_t> result(samples, parameters);
-    return random(result,
-        std::forward<TRng>(rng),
-        std::uniform_real_distribution<float>());
+    return random(result, rng, std::uniform_real_distribution<float>());
 }
 
 /// <summary>
@@ -245,13 +239,10 @@ inline matrix<typename TDist::result_type> random(
         _In_ const std::size_t samples,
         _In_ const std::size_t parameters,
         _In_ const bool preserve_draw,
-        _In_ TRng&& rng,
-        _In_ TDist&& distribution) {
+        _In_ TRng& rng,
+        _In_ TDist& distribution) {
     matrix<typename TDist::result_type> result(samples, parameters);
-    return random(result,
-        preserve_draw,
-        std::forward<TRng>(rng),
-        std::forward<TDist>(distribution));
+    return random(result, preserve_draw, rng, distribution);
 }
 
 /// <summary>
@@ -274,11 +265,35 @@ inline std::enable_if_t<std::is_floating_point_v<TValue>, matrix<TValue>>
 random(_In_ const std::size_t samples,
         _In_ const std::size_t parameters,
         _In_ const bool preserve_draw,
-        _In_ TRng&& rng) {
+        _In_ TRng& rng) {
     matrix<TValue> result(samples, parameters);
-    return random(result,
-        preserve_draw,
-        std::forward<TRng>(rng),
+    return random(result, preserve_draw, rng,
+        std::uniform_real_distribution<TValue>());
+}
+
+
+/// <summary>
+/// Create a uniformly distributed stratified sample from unit hypercube.
+/// </summary>
+/// <typeparam name="TValue">The type of values to be created, which must be a
+/// floating point type.</typeparam>
+/// <param name="samples">The number of samples to draw (the number of rows in
+/// the resulting matrix).</param>
+/// <param name="parameters">The number of parameters (columns in the resulting
+/// matrix), which will all be within [0, 1].</param>
+/// <param name="preserve_draw">Indicates whether the order of the draw should
+/// be preserved if less columns are selected. This parameter defaults to
+/// <c>false</c>.</param>
+/// <returns></returns>
+template<class TValue>
+inline std::enable_if_t<std::is_floating_point_v<TValue>, matrix<TValue>>
+random(_In_ const std::size_t samples,
+        _In_ const std::size_t parameters,
+        _In_ const bool preserve_draw = false) {
+    std::random_device rd;
+    std::mt19937 rng(rd());
+    matrix<TValue> result(samples, parameters);
+    return random(result, preserve_draw, rng,
         std::uniform_real_distribution<TValue>());
 }
 
@@ -323,8 +338,8 @@ random(_In_ const std::size_t samples,
     _In_ TIterator&& begin,
     _In_ TIterator&& end,
     _In_ const bool preserve_draw,
-    _In_ TRng&& rng,
-    _In_ TDist&& distribution);
+    _In_ TRng& rng,
+    _In_ TDist& distribution);
 
 /// <summary>
 /// Create a uniformly distributed stratified sample from a hypercube with
@@ -361,7 +376,7 @@ random(_In_ const std::size_t samples,
         _In_ TIterator&& begin,
         _In_ TIterator&& end,
         _In_ const bool preserve_draw,
-        _In_ TRng&& rng) {
+        _In_ TRng& rng) {
     typedef typename std::iterator_traits<TIterator>::value_type range_type;
     typedef typename range_type::value_type value_type;
     typedef make_floating_point_t<value_type> float_type;
@@ -369,7 +384,7 @@ random(_In_ const std::size_t samples,
         std::forward<TIterator>(begin),
         std::forward<TIterator>(end),
         preserve_draw,
-        std::forward<TRng>(rng),
+        rng,
         std::uniform_real_distribution<float_type>());
 }
 
@@ -405,14 +420,10 @@ template<class TValue, class TRng, class TDist>
 inline matrix<TValue> random(_In_ const std::size_t samples,
         _In_ const std::initializer_list<range<TValue>>& parameters,
         _In_ const bool preserve_draw,
-        _In_ TRng&& rng,
-        _In_ TDist&& distribution) {
-    return random(samples,
-        parameters.begin(),
-        parameters.end(),
-        preserve_draw,
-        std::forward<TRng>(rng),
-        std::forward<TDist>(distribution));
+        _In_ TRng& rng,
+        _In_ TDist& distribution) {
+    return random(samples, parameters.begin(), parameters.end(), preserve_draw,
+        rng, distribution);
 }
 
 /// <summary>
@@ -441,13 +452,9 @@ template<class TValue, class TRng, class TDist>
 inline matrix<TValue> random(_In_ const std::size_t samples,
         _In_ const std::initializer_list<range<TValue>>& parameters,
         _In_ const bool preserve_draw,
-        _In_ TRng&& rng) {
-    return random(samples,
-        parameters.begin(),
-        parameters.end(),
-        preserve_draw,
-        std::forward<TRng>(rng),
-        std::uniform_real_distribution<TValue>());
+        _In_ TRng& rng) {
+    return random(samples, parameters.begin(), parameters.end(), preserve_draw,
+        rng, std::uniform_real_distribution<TValue>());
 }
 
 /// <summary>

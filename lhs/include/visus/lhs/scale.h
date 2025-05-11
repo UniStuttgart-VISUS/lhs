@@ -10,6 +10,7 @@
 
 #include <cassert>
 #include <iterator>
+#include <stdexcept>
 
 #include "visus/lhs/is_range.h"
 #include "visus/lhs/matrix.h"
@@ -17,6 +18,20 @@
 
 
 LHS_DETAIL_NAMESPACE_BEGIN
+
+/// <summary>
+/// Converts a floating-point number in the range [0, 1] to a zero-based index.
+/// </summary>
+/// <typeparam name="TValue">A floating-point type.</typeparam>
+/// <param name="value">A value within [0, 1].</param>
+/// <param name="cnt">The total number of elements, which must be at least one.
+/// </param>
+/// <returns>A zero-based index into <paramref name="cnt" /> elements.</returns>
+/// <exception cref="std::invalid_argument">If <paramref name="cnt" /> is less than
+/// one or <paramref name="value" /> is not within [0, 1].</exception>
+template<class TValue>
+std::enable_if_t<std::is_floating_point_v<TValue>, std::size_t> scale(
+    _In_ const TValue value, _In_ const std::size_t cnt);
 
 /// <summary>
 /// Scales the parameters of the given unit hypercube sample to the ranges

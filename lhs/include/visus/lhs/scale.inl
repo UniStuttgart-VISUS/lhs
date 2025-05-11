@@ -8,6 +8,32 @@
 /*
  * LHS_DETAIL_NAMESPACE::scale
  */
+template<class TValue>
+std::enable_if_t<std::is_floating_point_v<TValue>, std::size_t>
+LHS_DETAIL_NAMESPACE::scale(_In_ const TValue value,
+        _In_ const std::size_t cnt) {
+    static constexpr auto half = static_cast<TValue>(0.5);
+
+    if ((value < 0.0f) || (value > 1.0f)) {
+        throw std::invalid_argument("The sample value must be within [0, 1].");
+    }
+
+    if (cnt < 0) {
+        throw std::invalid_argument("The list of parameter expressions must be "
+            "greater than zero.");
+    }
+
+    const auto end = static_cast<TValue>(cnt - 1);
+    const auto retval = static_cast<std::size_t>(end + half);
+    assert(retval >= 0);
+    assert(retval < cnt);
+    return retval;
+}
+
+
+/*
+ * LHS_DETAIL_NAMESPACE::scale
+ */
 template<class TIterator, LHS_NAMESPACE::matrix_layout Layout>
 std::enable_if_t<LHS_DETAIL_NAMESPACE::is_range_v<
         typename std::iterator_traits<TIterator>::value_type>
@@ -34,6 +60,7 @@ LHS_DETAIL_NAMESPACE::scale(_Inout_ matrix<typename
 
     return lhs;
 }
+
 
 /*
  * LHS_DETAIL_NAMESPACE::scale

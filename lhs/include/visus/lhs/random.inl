@@ -119,8 +119,8 @@ LHS_NAMESPACE::random(_In_ const std::size_t samples,
         _In_ TIterator&& begin,
         _In_ TIterator&& end,
         _In_ const bool preserve_draw,
-        _In_ TRng&& rng,
-        _In_ TDist&& distribution) {
+        _In_ TRng& rng,
+        _In_ TDist& distribution) {
     typedef typename std::iterator_traits<TIterator>::value_type range_type;
     typedef typename range_type::value_type int_type;
     typedef make_floating_point_t<int_type> float_type;
@@ -134,9 +134,7 @@ LHS_NAMESPACE::random(_In_ const std::size_t samples,
         std::forward<TDist>(distribution));
 
     // Scale to the requested range.
-    return detail::scale(retval,
-        std::forward<TIterator>(begin),
-        std::forward<TIterator>(end));
+    return detail::scale(retval, begin, end);
 }
 
 
