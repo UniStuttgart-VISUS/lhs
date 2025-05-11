@@ -20,7 +20,7 @@ auto lhs = visus::lhs::random<float>(4, 3, false, std::mt19937(42));
 
 Finally, it is possible to specify a specific random number distribution, which should, however, typically be a `std::uniform_real_distribution` within [0, 1]. The ability to change this is used for testing and should typically not be required for end users:
 ```c++
-auto lhs =visus::lhs::random(4, 3, false, std::mt19937(42), std::uniform_real_distribution<float>(0.0f, 1.0f));
+auto lhs = visus::lhs::random(4, 3, false, std::mt19937(42), std::uniform_real_distribution<float>(0.0f, 1.0f));
 ```
 
 A centred sample can be created like this:
