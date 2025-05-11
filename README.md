@@ -31,7 +31,7 @@ auto lhs = visus::lhs::centred<float>(4, 3);
 You can perform maximin optimisation (maximise the pairwise distance between the samples) on an existing sample:
 ```c++
 auto lhs = visus::lhs::random<float>(4, 3);
-maximin(lhs);
+visus::lhs::maximin(lhs);
 ```
 
 ### Create a discrete sample
